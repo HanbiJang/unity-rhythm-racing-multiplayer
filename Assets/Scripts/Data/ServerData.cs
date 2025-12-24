@@ -277,20 +277,24 @@ public class ReadyGameData : PacketData
 public class JudgementData : PacketData
 {
     UInt64 _userID;
+    UInt64 _roomID;
     int _NodeType;
 
     public UInt64 userID { get { return _userID; } set { _userID = value; } }
+    public UInt64 roomID { get { return _roomID; } set { _roomID = value; } }
     public int NodeType { get { return _NodeType; } set { _NodeType = value; } }
 
     //생성자
     public JudgementData()
     {
         _userID = 0;
+        _roomID = 0;
         _NodeType = 0;
     }
-    public JudgementData(UInt64 userID_, int NodeType_)
+    public JudgementData(UInt64 userID_, UInt64 roomID_, int NodeType_)
     {
         _userID = userID_;
+        _roomID = roomID_;
         _NodeType = NodeType_;
     }
 }
@@ -300,21 +304,21 @@ public class JudgementData : PacketData
 public class RetryData : PacketData
 {
     UInt64 _userID;
-    int _bodyLength;
+    UInt64 _roomID;
 
     public UInt64 UserID { get { return _userID; } set { _userID = value; } }
-    public int BodyLength { get { return _bodyLength; } set { _bodyLength = value; } }
+    public UInt64 RoomID { get { return _roomID; } set { _roomID = value; } }
 
     //생성자
     public RetryData()
     {
         _userID = 0;
-        _bodyLength = 0;
+        _roomID = 0;
     }
-    public RetryData(UInt64 userID_, int bodyLength_)
+    public RetryData(UInt64 userID_, UInt64 roomID_)
     {
         _userID = userID_;
-        _bodyLength = bodyLength_;
+        _roomID = roomID_;
     }
 }
 

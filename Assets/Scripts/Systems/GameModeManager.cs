@@ -33,6 +33,14 @@ public class GameModeManager : MonoBehaviour
     {
         bGameOver = true;
         m_ObjectSpawner?.StopSpawning();
+        
+        // 서버로 EndGame 패킷 전송
+        if (ServerInterface.Instance != null && ServerInterface.Instance.SocketConnection != null && ServerInterface.Instance.SocketConnection.Connected)
+        {
+            EndGameData endGameData = new EndGameData(GameState.Instance.UserId, GameState.Instance.RoomId);
+            ServerInterface.Instance.SendDataToServer(ServerInterface.Instance.SocketConnection, endGameData, (int)EPacketID.EndGame);
+            Debug.Log($"Sent EndGame: UserID={GameState.Instance.UserId}, RoomID={GameState.Instance.RoomId}");
+        }
     }
 
     public void ResetForLobby()
@@ -99,8 +107,8 @@ public class GameModeManager : MonoBehaviour
         if (bGameOver)
             return;
 
-
-        m_PlayerScore += Time.deltaTime * 330f;//= m_CurrentTime;
+        // 점수는 서버에서만 계산하고 ScoreBroadcast를 통해 받아옴
+        // m_PlayerScore는 ScoreBroadcast에서 서버 점수로 업데이트됨
 
         if (m_ObjectSpawner.IsInvoking() && m_CurrentTime >= g_SoundLength - 7.7f)
         {
@@ -109,8 +117,10 @@ public class GameModeManager : MonoBehaviour
         }
         if (m_CurrentTime >= g_SoundLength)
         {
-            bGameOver = true;
-            //m_ObjectSpawner.StopSpawning();
+            if (!bGameOver)
+            {
+                SetGameOver();
+            }
         }
 
 

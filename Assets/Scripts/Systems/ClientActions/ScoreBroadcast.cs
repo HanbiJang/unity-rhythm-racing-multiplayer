@@ -17,9 +17,21 @@ public class ScoreBroadcast : MonoBehaviour, IClientAction
         GameState.Instance.UserCount = data.UserCount;
         GameState.Instance.ScoreLIst = data.ScoreLIst;
 
-
-        //GameState에 저장된 데이터를 활용
-        //...
-
+        // 서버에서 계산한 점수를 GameModeManager에 동기화
+        if (GameModeManager.instance != null && data.ScoreLIst != null)
+        {
+            // 자신의 UserID에 해당하는 점수 찾기
+            ulong myUserId = GameState.Instance.UserId;
+            foreach (var scorePair in data.ScoreLIst)
+            {
+                if (scorePair.Key == myUserId)
+                {
+                    // 서버에서 계산한 점수로 업데이트
+                    GameModeManager.instance.m_PlayerScore = scorePair.Value;
+                    Debug.Log($"Score updated from server: {scorePair.Value}");
+                    break;
+                }
+            }
+        }
     }
 }

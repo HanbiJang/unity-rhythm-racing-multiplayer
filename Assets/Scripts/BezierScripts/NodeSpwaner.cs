@@ -43,16 +43,19 @@ public class NodeSpwaner : MonoBehaviour
         }
     }
 
-    public void SpawnNodeCentre(int id = 0)
+    public GameObject SpawnNodeCentre(int id = 0)
     {
         GameObject go = Instantiate(m_NodeList[id], senpai.position + senpai.rotation * Vector3.left * 0.5f, senpai.rotation);
+        return go;
     }
-    public void SpawnNodeLeft(int id = 0)
+    public GameObject SpawnNodeLeft(int id = 0)
     {
-        GameObject go = Instantiate(m_NodeList[id], senpai.position + senpai.rotation * Vector3.left * 0.5f + senpai.rotation * Vector3.down * 3, senpai.rotation);       
+        GameObject go = Instantiate(m_NodeList[id], senpai.position + senpai.rotation * Vector3.left * 0.5f + senpai.rotation * Vector3.down * 3, senpai.rotation);
+        return go;
     }
-    public void SpawnNodeRight(int id = 0)
+    public GameObject SpawnNodeRight(int id = 0)
     {
-        GameObject go = Instantiate(m_NodeList[id], senpai.position + senpai.rotation * Vector3.left * 0.5f + senpai.rotation * Vector3.up * 3, senpai.rotation);        
+        GameObject go = Instantiate(m_NodeList[id], senpai.position + senpai.rotation * Vector3.left * 0.5f + senpai.rotation * Vector3.up * 3, senpai.rotation);
+        return go;
     }
 }

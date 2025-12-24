@@ -16,13 +16,42 @@ public class SpawnNode : MonoBehaviour, IClientAction
 
 
         //위 data 활용
-        //GameModeManager.instance.m_ObjectSpawner.SpawnNodeCentre();
-
         NodeSpwaner ns = GameObject.FindWithTag("EditorOnly").GetComponent<ProxyScript>().proxy.GetComponent<NodeSpwaner>();
         if (ns == null)
-            Debug.Log("rotqlfk");
-        else
-            ns.SpawnNodeCentre();
-        //...           
+        {
+            Debug.LogError("NodeSpwaner not found!");
+            return;
+        }
+
+        // 노드 타입에 따라 다른 노드 스폰 (0: ObjectA, 1: ObjectB, 2: ObjectC, 3: AFail, 4: BFail, 5: CFail)
+        int nodeId = data.NodeType < 3 ? data.NodeType : data.NodeType - 3; // Fail 타입은 일반 노드와 같은 프리팹 사용
+        
+        // 노드 위치에 따라 스폰
+        GameObject spawnedNode = null;
+        switch (data.NodePos)
+        {
+            case 0: // Left
+                spawnedNode = ns.SpawnNodeLeft(nodeId);
+                break;
+            case 1: // Center
+                spawnedNode = ns.SpawnNodeCentre(nodeId);
+                break;
+            case 2: // Right
+                spawnedNode = ns.SpawnNodeRight(nodeId);
+                break;
+            default:
+                spawnedNode = ns.SpawnNodeCentre(nodeId);
+                break;
+        }
+
+        // 스폰된 노드에 타입 정보 설정
+        if (spawnedNode != null)
+        {
+            PickupScript ps = spawnedNode.GetComponent<PickupScript>();
+            if (ps != null)
+            {
+                ps.nodeType = data.NodeType;
+            }
+        }
     }
 }

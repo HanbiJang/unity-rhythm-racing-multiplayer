@@ -16,6 +16,14 @@ public class FloatablePickupScript : PickupScript
         //GameModeManager.instance.m_PlayerScore += 3000;
         //
 
+        // 서버로 Judgement 패킷 전송
+        if (ServerInterface.Instance != null && ServerInterface.Instance.SocketConnection != null && ServerInterface.Instance.SocketConnection.Connected)
+        {
+            JudgementData judgementData = new JudgementData(GameState.Instance.UserId, GameState.Instance.RoomId, nodeType);
+            ServerInterface.Instance.SendDataToServer(ServerInterface.Instance.SocketConnection, judgementData, (int)EPacketID.Judgement);
+            Debug.Log($"Sent Judgement: UserID={GameState.Instance.UserId}, RoomID={GameState.Instance.RoomId}, NodeType={nodeType}");
+        }
+
         Destroy(gameObject, 0.7f);
     }
 
