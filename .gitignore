@@ -97,3 +97,94 @@ InitTestScene*.unity*
 
 # Auto-generated scenes by play mode tests
 /[Aa]ssets/[Ii]nit[Tt]est[Ss]cene*.unity*
+
+# ============================================
+# Custom ignores for this project
+# ============================================
+
+# Image files (copyright concerns)
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.bmp
+*.tga
+*.tiff
+*.psd
+*.hdr
+*.exr
+
+# Audio files (copyright concerns)
+*.mp3
+*.wav
+*.ogg
+*.aac
+*.m4a
+*.flac
+
+# 3D Model files (copyright concerns)
+*.fbx
+*.obj
+*.dae
+*.3ds
+*.blend
+
+# Font files (copyright concerns)
+*.ttf
+*.otf
+*.fon
+
+# Material files (may contain texture references)
+*.mat
+
+# Prefab files (may contain asset references)
+*.prefab
+
+# Asset folders containing copyrighted content
+/[Aa]ssets/Aesthetics/
+/[Aa]ssets/Audio/
+/[Aa]ssets/Materials/
+/[Aa]ssets/textures/
+/[Aa]ssets/source/
+/[Aa]ssets/trash-bag/
+/[Aa]ssets/Realistic Terrain Collection/
+/[Aa]ssets/SkySeries Freebie/
+/[Aa]ssets/Resources/
+
+# C++ Build outputs (MyServer)
+/MyServer/x64/
+/MyServer/**/Debug/
+/MyServer/**/Release/
+/MyServer/**/x64/
+/MyServer/**/Win32/
+/MyServer/**/*.obj
+/MyServer/**/*.exe
+/MyServer/**/*.pdb
+/MyServer/**/*.ilk
+/MyServer/**/*.log
+/MyServer/**/*.tlog
+/MyServer/**/*.idb
+/MyServer/**/*.ipdb
+/MyServer/**/*.iobj
+/MyServer/**/*.exp
+/MyServer/**/*.lib
+/MyServer/**/*.dll
+
+# NuGet packages (can be restored)
+/MyServer/packages/
+/MyServer/**/packages/
+
+# Visual Studio user files
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Keep code files
+!*.cs
+!*.cpp
+!*.h
+!*.hpp
+!*.xml
+!*.unity
+!*.meta
