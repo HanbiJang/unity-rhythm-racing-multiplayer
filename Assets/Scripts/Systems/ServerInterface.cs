@@ -99,7 +99,20 @@ public class ServerInterface : MonoBehaviour
     {
         get
         {
+            if (GameState.IsTestMode)
+                return true; // 테스트 모드에서는 항상 리스닝 중인 것처럼
             return bListening;
+        }
+    }
+    
+    // 테스트 모드에서 가짜 연결 상태 반환
+    public bool IsConnected
+    {
+        get
+        {
+            if (GameState.IsTestMode)
+                return true; // 테스트 모드에서는 항상 연결된 것처럼
+            return socketConnection != null && socketConnection.Connected;
         }
     }
 
@@ -128,6 +141,12 @@ public class ServerInterface : MonoBehaviour
 
     private void Update()
     {
+        // 테스트 모드일 때는 서버 통신 스킵
+        if (GameState.IsTestMode)
+        {
+            return;
+        }
+        
         if (!bListening && socketConnection.Connected)
         {
             stream = socketConnection.GetStream();
@@ -142,6 +161,17 @@ public class ServerInterface : MonoBehaviour
 
     public void ConnectToTcpServer(string Ip, int port)
     {
+        // 테스트 모드일 때는 가짜 연결만 시뮬레이션
+        if (GameState.IsTestMode)
+        {
+            Debug.Log("[Test Mode] Simulating server connection");
+            bListening = true;
+            
+            // 테스트 모드에서 자동으로 JoinGame 시뮬레이션
+            StartCoroutine(SimulateJoinGame());
+            return;
+        }
+        
         if (!socketConnection.Connected)
         {
             Debug.Log("try");
@@ -155,6 +185,26 @@ public class ServerInterface : MonoBehaviour
                 Debug.Log("On client connect exception " + e);
             }
         }
+    }
+    
+    // 테스트 모드에서 JoinGame 패킷 시뮬레이션
+    IEnumerator SimulateJoinGame()
+    {
+        yield return new WaitForSeconds(0.5f);
+        
+        // 가짜 JoinGame 데이터 생성 (1인 플레이)
+        JoinGameData joinData = new JoinGameData();
+        joinData.UserID = 999; // 테스트용 UserID
+        joinData.RoomID = 1; // 테스트용 RoomID
+        
+        GameState.Instance.UserId = joinData.UserID;
+        GameState.Instance.RoomId = joinData.RoomID;
+        
+        // JoinGame 패킷 시뮬레이션
+        byte[] joinBytes = joinData.ConvertToByte();
+        ClientAction((int)EPacketID.JoinGame, socketConnection, joinBytes);
+        
+        Debug.Log("[Test Mode] Simulated JoinGame (1인 플레이)");
     }
 
     public void DisconnectToTcpServer()
@@ -178,6 +228,49 @@ public class ServerInterface : MonoBehaviour
     /// </summary>
     public void SendDataToServer(TcpClient socketConnection, PacketData packetData, int packetType)
     {
+        // 테스트 모드일 때는 로그만 남기고 실제 전송 안 함
+        if (GameState.IsTestMode)
+        {
+            EPacketID packetID = (EPacketID)packetType;
+            Debug.Log($"[Test Mode] Simulated Send: {packetID} (실제 서버 전송 안 함)");
+            
+            // 테스트 모드에서 특정 패킷에 대한 응답 시뮬레이션
+            if (packetID == EPacketID.ReadyGame)
+            {
+                StartCoroutine(SimulateStartGame());
+            }
+            else if (packetID == EPacketID.Judgement)
+            {
+                // 테스트 모드에서 Judgement 패킷을 보내면 점수 시뮬레이션
+                JudgementData judgementData = packetData as JudgementData;
+                if (judgementData != null)
+                {
+                    // GameModeManager가 없으면 안전하게 스킵
+                    if (GameModeManager.instance == null)
+                    {
+                        Debug.LogWarning("[Test Mode] GameModeManager.instance 가 없어 점수 시뮬레이션을 건너뜁니다.");
+                        return;
+                    }
+
+                    // 간단한 점수 계산 시뮬레이션
+                    ulong baseScore = 0;
+                    switch (judgementData.NodeType)
+                    {
+                        case 0: baseScore = 3000; break; // ObjectA
+                        case 1: baseScore = 2000; break; // ObjectB
+                        case 2: baseScore = 4500; break; // ObjectC
+                    }
+                    
+                    if (baseScore > 0)
+                    {
+                        // 점수 누적 (테스트용)
+                        ulong currentScore = (ulong)GameModeManager.instance.m_PlayerScore;
+                        ScoreBroadcast.SimulateScoreBroadcast(currentScore + baseScore);
+                    }
+                }
+            }
+            return;
+        }
 
         byte[] buffer = CreateSendPacket(packetData, packetType);
 
@@ -190,7 +283,7 @@ public class ServerInterface : MonoBehaviour
         }
         // Get a stream object for writing.             
 
-        if (stream.CanWrite && socketConnection.Connected)
+        if (stream != null && stream.CanWrite && socketConnection.Connected)
         {
             // Write byte array to socketConnection stream.
             string str = ".";
@@ -202,6 +295,22 @@ public class ServerInterface : MonoBehaviour
             stream.Write(buffer, 0, buffer.Length);
         }
 
+    }
+    
+    // 테스트 모드에서 StartGame 패킷 시뮬레이션
+    IEnumerator SimulateStartGame()
+    {
+        yield return new WaitForSeconds(0.5f);
+        
+        // 가짜 StartGame 데이터 생성 (1인 플레이)
+        StartGameData startData = new StartGameData();
+        startData.UserCount = 1;
+        startData.UserIds = new List<ulong> { GameState.Instance.UserId };
+        
+        byte[] startBytes = startData.ConvertToByte();
+        ClientAction((int)EPacketID.StartGame, socketConnection, startBytes);
+        
+        Debug.Log("[Test Mode] Simulated StartGame (1인 플레이)");
     }
 
 

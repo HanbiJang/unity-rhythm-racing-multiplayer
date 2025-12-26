@@ -29,6 +29,10 @@ public class GameState : MonoBehaviour
     string ip = "127.0.0.1";
     int portNum = 8888;
 
+    // 테스트 모드 (서버 없이 클라이언트만 테스트)
+    // true로 설정하면 서버 연결 없이 테스트 가능
+    static bool isTestMode = false;
+
     ulong userId;
     ulong roomId;
     int userCount;
@@ -43,6 +47,12 @@ public class GameState : MonoBehaviour
 
     public string Ip { get { return ip; } set { ip = value; } }
     public int PortNum { get { return portNum; } set { portNum = value; } }
+    
+    public static bool IsTestMode { get { return isTestMode; } set { isTestMode = value; } }
+    
+    // 테스트 모드 활성화/비활성화 헬퍼 메서드
+    public static void EnableTestMode() { isTestMode = true; Debug.Log("[Test Mode] 활성화됨"); }
+    public static void DisableTestMode() { isTestMode = false; Debug.Log("[Test Mode] 비활성화됨"); }
 
     private void Awake()
     {

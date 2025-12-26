@@ -35,7 +35,7 @@ public class GameModeManager : MonoBehaviour
         m_ObjectSpawner?.StopSpawning();
         
         // 서버로 EndGame 패킷 전송
-        if (ServerInterface.Instance != null && ServerInterface.Instance.SocketConnection != null && ServerInterface.Instance.SocketConnection.Connected)
+        if (ServerInterface.Instance != null && (GameState.IsTestMode || (ServerInterface.Instance.SocketConnection != null && ServerInterface.Instance.SocketConnection.Connected)))
         {
             EndGameData endGameData = new EndGameData(GameState.Instance.UserId, GameState.Instance.RoomId);
             ServerInterface.Instance.SendDataToServer(ServerInterface.Instance.SocketConnection, endGameData, (int)EPacketID.EndGame);

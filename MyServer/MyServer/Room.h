@@ -29,7 +29,8 @@ class Room
 {
 	enum
 	{
-		MAX_SESSION_SIZE = 2,
+		MAX_SESSION_SIZE = 2,  // 최대 인원수 (1인 플레이도 가능)
+		MIN_SESSION_SIZE = 1,  // 최소 인원수 (1인 플레이 가능)
 	};
 
 public:

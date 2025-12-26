@@ -142,7 +142,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\GameJam1 (1)\ContentLoader.cpp" />
+    <ClCompile Include="ContentLoader.cpp" />
     <ClCompile Include="FrameTimer.cpp" />
     <ClCompile Include="GameJam_1.cpp" />
     <ClCompile Include="IDMaker.cpp" />
@@ -157,7 +157,7 @@
     <ClCompile Include="tinyxml2.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\GameJam1 (1)\ContentLoader.h" />
+    <ClInclude Include="ContentLoader.h" />
     <ClInclude Include="FrameTimer.h" />
     <ClInclude Include="IDMaker.h" />
     <ClInclude Include="Logger.h" />

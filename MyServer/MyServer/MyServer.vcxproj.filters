@@ -54,7 +54,7 @@
     <ClCompile Include="tinyxml2.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\GameJam1 (1)\ContentLoader.cpp">
+    <ClCompile Include="ContentLoader.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
@@ -89,7 +89,7 @@
     <ClInclude Include="tinyxml2.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\GameJam1 (1)\ContentLoader.h">
+    <ClInclude Include="ContentLoader.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>

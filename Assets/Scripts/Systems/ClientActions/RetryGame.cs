@@ -22,7 +22,7 @@ public class RetryGame : MonoBehaviour, IClientAction
         ClientState.Set(GameClientState.Lobby);
         
         // 서버에 ReadyGame 패킷 전송하여 재시작 준비 완료 알림
-        if (ServerInterface.Instance != null && ServerInterface.Instance.SocketConnection != null && ServerInterface.Instance.SocketConnection.Connected)
+        if (ServerInterface.Instance != null && (GameState.IsTestMode || (ServerInterface.Instance.SocketConnection != null && ServerInterface.Instance.SocketConnection.Connected)))
         {
             ReadyGameData readyGameData = new ReadyGameData(GameState.Instance.UserId, GameState.Instance.RoomId);
             ServerInterface.Instance.SendDataToServer(ServerInterface.Instance.SocketConnection, readyGameData, (int)EPacketID.ReadyGame);

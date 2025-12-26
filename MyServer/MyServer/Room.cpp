@@ -159,7 +159,8 @@ bool Room::ReadyCheck()
 			allReady = false;
 	}
 
-	return allReady && NumberOfPeople() == m_maxSessionCount;
+	// 1인 플레이도 가능하도록 수정: 최소 1명 이상이고 모두 Ready 상태면 시작 가능
+	return allReady && NumberOfPeople() >= 1 && NumberOfPeople() <= m_maxSessionCount;
 }
 
 bool Room::IsStart()

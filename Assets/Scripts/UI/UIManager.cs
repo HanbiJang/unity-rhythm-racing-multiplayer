@@ -75,6 +75,21 @@ public class UIManager : MonoBehaviour
         //테스트 코드, (서버에서 데이터를 받았다고 치고) 임의로 5초 뒤에 Join 동작을, 다시 5초 뒤에 Start 동작을 실행함
         //StartCoroutine(testCo());
     }
+    
+    /// <summary>
+    /// 테스트 모드 토글 버튼 (옵션)
+    /// </summary>
+    public void ToggleTestMode()
+    {
+        if (GameState.IsTestMode)
+        {
+            GameState.DisableTestMode();
+        }
+        else
+        {
+            GameState.EnableTestMode();
+        }
+    }
 
     IEnumerator testCo()
     {

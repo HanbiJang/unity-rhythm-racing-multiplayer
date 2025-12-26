@@ -8,7 +8,11 @@ public class NodeSpwaner : MonoBehaviour
     List<GameObject> m_NodeList = new List<GameObject>();
 
     [SerializeField]
-    Transform senpai;
+    Transform spawnOrigin;
+    
+    // 디버깅용 public getter
+    public int NodeListCount { get { return m_NodeList != null ? m_NodeList.Count : 0; } }
+    public bool IsNodeListNull { get { return m_NodeList == null; } }
 
     private void Update()
     {
@@ -45,17 +49,38 @@ public class NodeSpwaner : MonoBehaviour
 
     public GameObject SpawnNodeCentre(int id = 0)
     {
-        GameObject go = Instantiate(m_NodeList[id], senpai.position + senpai.rotation * Vector3.left * 0.5f, senpai.rotation);
+        // #region agent log
+        try {
+            string logEntry = $"{{\"sessionId\":\"debug-session\",\"runId\":\"run1\",\"hypothesisId\":\"A\",\"location\":\"NodeSpwaner.cs:48\",\"message\":\"SpawnNodeCentre entry\",\"data\":{{\"id\":{id},\"nodeListCount\":{NodeListCount},\"isValidIndex\":{(!IsNodeListNull && id >= 0 && id < NodeListCount).ToString().ToLower()}}},\"timestamp\":{System.DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()}}}\n";
+            System.IO.File.AppendAllText(@"d:\GitRepo\Unity Racing Game\.cursor\debug.log", logEntry);
+        } catch {}
+        // #endregion
+        
+        GameObject go = Instantiate(m_NodeList[id], spawnOrigin.position + spawnOrigin.rotation * Vector3.left * 0.5f, spawnOrigin.rotation);
         return go;
     }
     public GameObject SpawnNodeLeft(int id = 0)
     {
-        GameObject go = Instantiate(m_NodeList[id], senpai.position + senpai.rotation * Vector3.left * 0.5f + senpai.rotation * Vector3.down * 3, senpai.rotation);
+        // #region agent log
+        try {
+            string logEntry = $"{{\"sessionId\":\"debug-session\",\"runId\":\"run1\",\"hypothesisId\":\"A\",\"location\":\"NodeSpwaner.cs:54\",\"message\":\"SpawnNodeLeft entry\",\"data\":{{\"id\":{id},\"nodeListCount\":{NodeListCount},\"isValidIndex\":{(!IsNodeListNull && id >= 0 && id < NodeListCount).ToString().ToLower()}}},\"timestamp\":{System.DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()}}}\n";
+            System.IO.File.AppendAllText(@"d:\GitRepo\Unity Racing Game\.cursor\debug.log", logEntry);
+        } catch {}
+        // #endregion
+        
+        GameObject go = Instantiate(m_NodeList[id], spawnOrigin.position + spawnOrigin.rotation * Vector3.left * 0.5f + spawnOrigin.rotation * Vector3.down * 3, spawnOrigin.rotation);
         return go;
     }
     public GameObject SpawnNodeRight(int id = 0)
     {
-        GameObject go = Instantiate(m_NodeList[id], senpai.position + senpai.rotation * Vector3.left * 0.5f + senpai.rotation * Vector3.up * 3, senpai.rotation);
+        // #region agent log
+        try {
+            string logEntry = $"{{\"sessionId\":\"debug-session\",\"runId\":\"run1\",\"hypothesisId\":\"A\",\"location\":\"NodeSpwaner.cs:58\",\"message\":\"SpawnNodeRight entry\",\"data\":{{\"id\":{id},\"nodeListCount\":{NodeListCount},\"nodeListIsNull\":{IsNodeListNull.ToString().ToLower()},\"isValidIndex\":{(!IsNodeListNull && id >= 0 && id < NodeListCount).ToString().ToLower()}}},\"timestamp\":{System.DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()}}}\n";
+            System.IO.File.AppendAllText(@"d:\GitRepo\Unity Racing Game\.cursor\debug.log", logEntry);
+        } catch {}
+        // #endregion
+        
+        GameObject go = Instantiate(m_NodeList[id], spawnOrigin.position + spawnOrigin.rotation * Vector3.left * 0.5f + spawnOrigin.rotation * Vector3.up * 3, spawnOrigin.rotation);
         return go;
     }
 }

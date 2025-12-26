@@ -10,15 +10,23 @@ public class EndGame : MonoBehaviour, IClientAction
     /// <param name="byteData"></param>
     public void Do(byte[] byteData)
     {
-        Debug.Log("EndGame()");
+        Debug.Log("[EndGame] EndGame packet received from server");
 
         //해당 방의 데이터
         EndGameData endGameData = new EndGameData();
         endGameData.ConvertToGameData(byteData);
-        // Debug.Log("userID " + endGameData.UserID + "roomID " + endGameData.RoomID);
+        Debug.Log($"[EndGame] UserID: {endGameData.UserID}, RoomID: {endGameData.RoomID}");
 
-        // 1) 인게임 정지 신호
-        GameModeManager.instance?.SetGameOver();
+        // 1) 인게임 정지 신호 (플레이어 이동 중지 포함)
+        if (GameModeManager.instance != null)
+        {
+            GameModeManager.instance.SetGameOver();
+            Debug.Log("[EndGame] GameOver state set");
+        }
+        else
+        {
+            Debug.LogError("[EndGame] GameModeManager.instance is null!");
+        }
 
         // 2) 결과 데이터 갱신 (이미 주기적 ScoreBroadcast로도 받음)
         //    결과씬/패널에서 GameState.Instance.ScoreLIst를 사용

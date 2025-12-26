@@ -34,4 +34,38 @@ public class ScoreBroadcast : MonoBehaviour, IClientAction
             }
         }
     }
+    
+    // 테스트 모드에서 점수 브로드캐스트 시뮬레이션
+    public static void SimulateScoreBroadcast(ulong score)
+    {
+        if (GameModeManager.instance != null)
+        {
+            GameModeManager.instance.m_PlayerScore = score;
+            
+            // GameState에도 업데이트
+            if (GameState.Instance.ScoreLIst == null)
+            {
+                GameState.Instance.ScoreLIst = new List<KeyValuePair<ulong, ulong>>();
+            }
+            
+            // 기존 점수 업데이트 또는 추가
+            bool found = false;
+            for (int i = 0; i < GameState.Instance.ScoreLIst.Count; i++)
+            {
+                if (GameState.Instance.ScoreLIst[i].Key == GameState.Instance.UserId)
+                {
+                    GameState.Instance.ScoreLIst[i] = new KeyValuePair<ulong, ulong>(GameState.Instance.UserId, (ulong)score);
+                    found = true;
+                    break;
+                }
+            }
+            
+            if (!found)
+            {
+                GameState.Instance.ScoreLIst.Add(new KeyValuePair<ulong, ulong>(GameState.Instance.UserId, (ulong)score));
+            }
+            
+            GameState.Instance.UserCount = GameState.Instance.ScoreLIst.Count;
+        }
+    }
 }

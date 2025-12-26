@@ -26,6 +26,7 @@ namespace PathCreation.Examples
         {
             if (pathCreator != null)
             {
+                // 게임 오버 체크는 PlayerFollower에서 처리하므로 여기서는 기본 동작만 수행
                 distanceTravelled += speed * Time.deltaTime;
                 transform.position = pathCreator.path.GetPointAtDistance(distanceTravelled, endOfPathInstruction);
                 transform.rotation = pathCreator.path.GetRotationAtDistance(distanceTravelled, endOfPathInstruction);
