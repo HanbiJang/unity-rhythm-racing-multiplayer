@@ -306,11 +306,12 @@ public class ServerInterface : MonoBehaviour
         StartGameData startData = new StartGameData();
         startData.UserCount = 1;
         startData.UserIds = new List<ulong> { GameState.Instance.UserId };
+        startData.TotalNoteCount = 100;  // 테스트 모드용 기본값 (실제로는 서버에서 받아야 함)
         
         byte[] startBytes = startData.ConvertToByte();
         ClientAction((int)EPacketID.StartGame, socketConnection, startBytes);
         
-        Debug.Log("[Test Mode] Simulated StartGame (1인 플레이)");
+        Debug.Log($"[Test Mode] Simulated StartGame (1인 플레이, Total Notes: {startData.TotalNoteCount})");
     }
 
 

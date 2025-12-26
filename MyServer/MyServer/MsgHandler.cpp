@@ -115,9 +115,14 @@ void HandleReadyGame(Message& msg)
 		startGamePacket.PutData(reinterpret_cast<char*>(&userCount), sizeof(uint32_t));
 		uint64_t* userList = room->GetUserList();
 		startGamePacket.PutData(reinterpret_cast<char*>(userList), sizeof(uint64_t) * userCount);
+		
+		// 전체 음악 노트 개수 추가
+		uint32_t totalNoteCount = static_cast<uint32_t>(room->GetTotalNoteCount());
+		startGamePacket.PutData(reinterpret_cast<char*>(&totalNoteCount), sizeof(uint32_t));
+		
 		startGamePacket.EncodeHeader(PacketType::StartGame);
 
-		std::cout << "Game Start!!\n";
+		std::cout << "Game Start!! Total Notes: " << totalNoteCount << "\n";
 		room->Deliver(startGamePacket);
 		room->Start();
 	}

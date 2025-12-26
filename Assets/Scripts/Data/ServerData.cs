@@ -375,20 +375,53 @@ public class StartGameData : PacketData
 {
     int userCount;
     List<UInt64> userIds;
+    int totalNoteCount;  // 전체 음악 노트 개수
 
     public int UserCount { get { return userCount; } set { userCount = value; } }
     public List<UInt64> UserIds { get { return userIds; } set { userIds = value; } }
+    public int TotalNoteCount { get { return totalNoteCount; } set { totalNoteCount = value; } }
 
     //생성자
     public StartGameData()
     {
         userCount = 0;
         userIds = new List<ulong>();
+        totalNoteCount = 0;
     }
-    public StartGameData(int userCount_, List<UInt64> roomID_)
+    public StartGameData(int userCount_, List<UInt64> roomID_, int totalNoteCount_ = 0)
     {
         userCount = userCount_;
         userIds = roomID_;
+        totalNoteCount = totalNoteCount_;
+    }
+
+    // StartGameData는 커스텀 파싱 필요 (List 뒤에 int가 있으므로)
+    public new PacketData ConvertToGameData(byte[] ByteArr)
+    {
+        int offset = 0;
+
+        // userCount 읽기
+        if (offset + sizeof(int) > ByteArr.Length) return this;
+        userCount = BitConverter.ToInt32(ByteArr, offset);
+        offset += sizeof(int);
+
+        // userIds 읽기 (userCount만큼만)
+        userIds = new List<UInt64>();
+        for (int i = 0; i < userCount; i++)
+        {
+            if (offset + sizeof(UInt64) > ByteArr.Length) break;
+            UInt64 userId = BitConverter.ToUInt64(ByteArr, offset);
+            userIds.Add(userId);
+            offset += sizeof(UInt64);
+        }
+
+        // totalNoteCount 읽기
+        if (offset + sizeof(int) <= ByteArr.Length)
+        {
+            totalNoteCount = BitConverter.ToInt32(ByteArr, offset);
+        }
+
+        return this;
     }
 }
 

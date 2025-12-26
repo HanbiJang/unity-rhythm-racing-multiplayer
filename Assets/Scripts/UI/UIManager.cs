@@ -15,8 +15,6 @@ public class UIManager : MonoBehaviour
 
 
     [SerializeField, Header("Canvas Elements")]
-    Slider m_ProgressBar;
-    [SerializeField]
     Text m_txScore;
     [SerializeField]
     Text m_txCurrentRanking;
@@ -36,21 +34,16 @@ public class UIManager : MonoBehaviour
     GameObject LoadingScene;
 
 
-
     // Update is called once per frame
     void Update()
     {
-        //TODO : Check this is needed
+        // StartScene에서는 InGame UI를 업데이트하지 않음
+        // Road 씬의 InGameUIController가 자체적으로 업데이트함
         if (m_InGameUI == null || m_InGameUI.active == false)
             return;
 
-
-        m_txScore.text = Mathf.Floor(GameModeManager.instance.m_PlayerScore).ToString();
-        m_ProgressBar.value = ((GameModeManager.instance.m_CurrentTime) / (GameModeManager.instance.g_SoundLength));
-
-        m_HealthRate = (float)GameModeManager.instance.m_PlayerHealth / GameModeManager.instance.m_PlayerMaxHealth;
-
-        m_ImageLeft.color = m_ImageRight.color = 0.7f * Color.red * Mathf.Lerp(1, 0, m_HealthRate);
+        // StartScene에 있는 UI 업데이트는 여기서 처리
+        // Road 씬의 UI 업데이트는 InGameUIController에서 처리
     }
 
     //===

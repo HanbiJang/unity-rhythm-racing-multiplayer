@@ -15,6 +15,10 @@ public class GameModeManager : MonoBehaviour
     [SerializeField, Header("Length of Background Music(seconds)")]
     public float g_SoundLength;
 
+    [SerializeField, Header("Music Note Progress")]
+    public int totalNoteCount = 0;  // 전체 음악 노트 개수
+    public int currentNoteIndex = 0;  // 현재 진행한 노트 인덱스
+
     // Player Info
     public float m_PlayerScore;
     public int m_PlayerMaxHealth;
@@ -68,6 +72,7 @@ public class GameModeManager : MonoBehaviour
     public void GameStart()
     {
         m_CurrentTime = 0f;
+        currentNoteIndex = 0;  // 게임 시작 시 초기화
 
         //if(LoadingRoad() == DONE)
 

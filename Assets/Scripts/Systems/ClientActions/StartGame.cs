@@ -15,6 +15,15 @@ public class StartGame : MonoBehaviour, IClientAction
         StartGameData data = new StartGameData();
         data.ConvertToGameData(byteData);
         Debug.Log("UserID " + data.UserCount + "UserIds.Count " + data.UserIds.Count);
+        Debug.Log("Total Note Count: " + data.TotalNoteCount);
+
+        // GameModeManager에 전체 노트 개수 저장
+        if (GameModeManager.instance != null)
+        {
+            GameModeManager.instance.totalNoteCount = data.TotalNoteCount;
+            GameModeManager.instance.currentNoteIndex = 0;  // 초기화
+            Debug.Log($"GameModeManager: Total Notes = {GameModeManager.instance.totalNoteCount}");
+        }
 
         //게임을 시작       
         //if (ServerInterface.Instance.GameSceneLoadAsync.isDone) //로딩이 끝났다면

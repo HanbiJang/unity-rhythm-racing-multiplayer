@@ -22,10 +22,21 @@ public class SpawnNode : MonoBehaviour, IClientAction
         // #endregion
 
         //위 data 활용
-        NodeSpwaner ns = GameObject.FindWithTag("EditorOnly").GetComponent<ProxyScript>().proxy.GetComponent<NodeSpwaner>();
+        // 씬 전환 중일 수 있으므로 여러 번 시도
+        NodeSpwaner ns = null;
+        GameObject editorOnlyObj = GameObject.FindWithTag("EditorOnly");
+        if (editorOnlyObj != null)
+        {
+            ProxyScript proxyScript = editorOnlyObj.GetComponent<ProxyScript>();
+            if (proxyScript != null && proxyScript.proxy != null)
+            {
+                ns = proxyScript.proxy.GetComponent<NodeSpwaner>();
+            }
+        }
+
         if (ns == null)
         {
-            Debug.LogError("NodeSpwaner not found!");
+            Debug.LogWarning("NodeSpwaner not found! Scene might still be loading. Skipping node spawn.");
             return;
         }
 
@@ -97,6 +108,13 @@ public class SpawnNode : MonoBehaviour, IClientAction
             {
                 ps.nodeType = data.NodeType;
             }
+        }
+
+        // 노트가 스폰될 때마다 진행 인덱스 증가
+        if (GameModeManager.instance != null)
+        {
+            GameModeManager.instance.currentNoteIndex++;
+            Debug.Log($"Note Progress: {GameModeManager.instance.currentNoteIndex} / {GameModeManager.instance.totalNoteCount}");
         }
     }
 }

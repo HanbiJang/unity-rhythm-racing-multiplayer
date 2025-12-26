@@ -76,6 +76,8 @@ public:
 
 	void CalculateScore(uint64_t userID, uint32_t nodeType);
 	void MakeScoreList();
+	
+	int GetTotalNoteCount() const { return static_cast<int>(m_nodeList.size()); }
 
 private:
 	uint64_t m_roomID;
