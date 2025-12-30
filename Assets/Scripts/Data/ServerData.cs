@@ -279,10 +279,16 @@ public class JudgementData : PacketData
     UInt64 _userID;
     UInt64 _roomID;
     int _NodeType;
+    int _JudgmentType;  // 판정 타입 (0: Perfect, 1: Good, 2: Bad, 3: Miss)
+    float _TimeDifference;  // 예상 타이밍과의 차이 (초)
+    int _Score;  // 판정 점수
 
     public UInt64 userID { get { return _userID; } set { _userID = value; } }
     public UInt64 roomID { get { return _roomID; } set { _roomID = value; } }
     public int NodeType { get { return _NodeType; } set { _NodeType = value; } }
+    public int JudgmentType { get { return _JudgmentType; } set { _JudgmentType = value; } }
+    public float TimeDifference { get { return _TimeDifference; } set { _TimeDifference = value; } }
+    public int Score { get { return _Score; } set { _Score = value; } }
 
     //생성자
     public JudgementData()
@@ -290,12 +296,18 @@ public class JudgementData : PacketData
         _userID = 0;
         _roomID = 0;
         _NodeType = 0;
+        _JudgmentType = 0;
+        _TimeDifference = 0f;
+        _Score = 0;
     }
     public JudgementData(UInt64 userID_, UInt64 roomID_, int NodeType_)
     {
         _userID = userID_;
         _roomID = roomID_;
         _NodeType = NodeType_;
+        _JudgmentType = 0;
+        _TimeDifference = 0f;
+        _Score = 0;
     }
 }
 

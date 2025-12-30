@@ -1,9 +1,61 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using PathCreation.Examples;
 
 public class SpawnNode : MonoBehaviour, IClientAction
 {
+    /// <summary>
+    /// 노트가 플레이어에게 도달하는 예상 시간을 계산합니다.
+    /// </summary>
+    private float CalculateExpectedTime(GameObject node)
+    {
+        if (GameModeManager.instance == null)
+        {
+            Debug.LogWarning("[SpawnNode] GameModeManager is null, using current time as expected time");
+            return 0f;
+        }
+
+        // 현재 게임 시간
+        float currentTime = GameModeManager.instance.m_CurrentTime;
+
+        // SpwanerFollower 찾기
+        SpwanerFollower spawnerFollower = FindObjectOfType<SpwanerFollower>();
+        if (spawnerFollower == null)
+        {
+            Debug.LogWarning("[SpawnNode] SpwanerFollower not found, using current time as expected time");
+            return currentTime;
+        }
+
+        // 노트의 PathFollower 찾기
+        PathFollower nodeFollower = node.GetComponent<PathFollower>();
+        if (nodeFollower == null)
+        {
+            Debug.LogWarning("[SpawnNode] Node doesn't have PathFollower, using current time as expected time");
+            return currentTime;
+        }
+
+        // 노트와 플레이어 사이의 거리 계산
+        // SpwanerFollower가 플레이어보다 앞서 있는 거리를 가져옴
+        float gapDistance = spawnerFollower.GapBetweenPlayer;
+
+        // 노트의 이동 속도
+        float nodeSpeed = nodeFollower.speed;
+        if (nodeSpeed <= 0f)
+        {
+            Debug.LogWarning("[SpawnNode] Node speed is 0 or negative, using default calculation");
+            // 기본값으로 대략적인 시간 계산 (예: 2초)
+            return currentTime + 2f;
+        }
+
+        // 노트가 플레이어에게 도달하는 데 걸리는 시간
+        float timeToReachPlayer = gapDistance / nodeSpeed;
+
+        // 예상 타이밍 = 현재 시간 + 도달 시간
+        float expectedTime = currentTime + timeToReachPlayer;
+
+        return expectedTime;
+    }
     //서버에서 준 노드 데이터를 기반으로 노드를 스폰하는 코드
     public void Do(byte[] byteData)
     {
@@ -100,13 +152,22 @@ public class SpawnNode : MonoBehaviour, IClientAction
                 break;
         }
 
-        // 스폰된 노드에 타입 정보 설정
+        // 스폰된 노드에 타입 정보 및 예상 타이밍 설정
         if (spawnedNode != null)
         {
             PickupScript ps = spawnedNode.GetComponent<PickupScript>();
             if (ps != null)
             {
                 ps.nodeType = data.NodeType;
+                
+                // 예상 타이밍 계산
+                // 노트가 플레이어에게 도달하는 시간을 계산
+                // SpwanerFollower는 플레이어보다 GapBetweenPlayer만큼 앞서 있음
+                // 노트의 이동 속도는 PathFollower의 speed를 사용
+                float expectedTime = CalculateExpectedTime(spawnedNode);
+                ps.SetExpectedTime(expectedTime);
+                
+                Debug.Log($"[SpawnNode] Node spawned with expected time: {expectedTime:F2}s, NodeType: {data.NodeType}, NodePos: {data.NodePos}");
             }
         }
 

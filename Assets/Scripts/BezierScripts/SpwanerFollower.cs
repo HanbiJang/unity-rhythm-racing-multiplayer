@@ -6,7 +6,7 @@ using UnityEngine;
 public class SpwanerFollower : PathFollower
 {
     [SerializeField]
-    float GapBetweenPlayer = 30f;
+    public float GapBetweenPlayer = 30f;
 
     // Start is called before the first frame update
     protected override void Start()
