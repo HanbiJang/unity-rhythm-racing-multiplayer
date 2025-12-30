@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Linq;
+using UnityEngine;
 
 /// <summary>
 /// Server와 Client 간의 주고받는 데이터
@@ -196,7 +197,16 @@ public class PacketData : TSData
                 sizeOfField = Marshal.SizeOf(f.FieldType); //주의***
                 if (f.FieldType.Equals(typeof(int))) { buffer = BitConverter.GetBytes((int)f.GetValue(this)); }
                 else if (f.FieldType.Equals(typeof(UInt64))) { buffer = BitConverter.GetBytes((UInt64)f.GetValue(this)); }
-                Array.Copy(buffer, 0, result, current_pos, sizeOfField);
+                else if (f.FieldType.Equals(typeof(float))) { buffer = BitConverter.GetBytes((float)f.GetValue(this)); }
+                
+                if (buffer != null)
+                {
+                    Array.Copy(buffer, 0, result, current_pos, sizeOfField);
+                }
+                else
+                {
+                    Debug.LogError($"[PacketData.ConvertToByte] Unsupported field type: {f.FieldType.Name} in field: {f.Name}");
+                }
             }
             current_pos += sizeOfField;
         }
@@ -215,6 +225,7 @@ public class PacketData : TSData
         {
             if (f.FieldType.Equals(typeof(int))) size += sizeof(int); //주의***
             else if (f.FieldType.Equals(typeof(UInt64))) size += sizeof(UInt64);
+            else if (f.FieldType.Equals(typeof(float))) size += sizeof(float);
             else if (f.FieldType.Equals(typeof(List<KeyValuePair<int, int>>)))
             {
                 List<KeyValuePair<int, int>> list = (List<KeyValuePair<int, int>>)f.GetValue(this); //현재 클래스의 List형 필드를 가져옴
