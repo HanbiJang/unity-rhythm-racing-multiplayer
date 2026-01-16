@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Net.Sockets;
@@ -253,19 +253,27 @@ public class ServerInterface : MonoBehaviour
                     }
 
                     // 간단한 점수 계산 시뮬레이션
-                    ulong baseScore = 0;
+                    long scoreDelta = 0;
                     switch (judgementData.NodeType)
                     {
-                        case 0: baseScore = 3000; break; // ObjectA
-                        case 1: baseScore = 2000; break; // ObjectB
-                        case 2: baseScore = 4500; break; // ObjectC
+                        case 0: scoreDelta = 3000; break; // ObjectA
+                        case 1: scoreDelta = 2000; break; // ObjectB
+                        case 2: scoreDelta = 4500; break; // ObjectC
+                        case 3: scoreDelta = -3000; break; // AFail
+                        case 4: scoreDelta = -2000; break; // BFail
+                        case 5: scoreDelta = -4500; break; // CFail
                     }
                     
-                    if (baseScore > 0)
+                    if (scoreDelta != 0)
                     {
                         // 점수 누적 (테스트용)
-                        ulong currentScore = (ulong)GameModeManager.instance.m_PlayerScore;
-                        ScoreBroadcast.SimulateScoreBroadcast(currentScore + baseScore);
+                        long currentScore = (long)GameModeManager.instance.m_PlayerScore;
+                        long nextScore = currentScore + scoreDelta;
+                        if (nextScore < 0)
+                        {
+                            nextScore = 0;
+                        }
+                        ScoreBroadcast.SimulateScoreBroadcast((ulong)nextScore);
                     }
                 }
             }

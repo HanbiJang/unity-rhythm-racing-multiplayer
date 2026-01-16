@@ -1439,6 +1439,7 @@ MonoBehaviour:
   - {fileID: 4707292920227237253, guid: 9a81657ca4cecef4a84e3ad1fb70df83, type: 3}
   - {fileID: 633026953512710552, guid: c8c9a3a6da9d0da44b5380665a17ad09, type: 3}
   - {fileID: 633026953512710552, guid: c8c9a3a6da9d0da44b5380665a17ad09, type: 3}
+  - {fileID: 4707292920227237253, guid: 7fdba7d7c18c04a41a47fafbe0e1835c, type: 3}
   spawnOrigin: {fileID: 0}
 --- !u!1 &848103242
 GameObject:
@@ -2259,11 +2260,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 61142da70c74f9146a6a6201b5a01358, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hitPointEffectPrefab: {fileID: 4515497926535975121, guid: bddb971e34eb14d48be30c7b922eb077, type: 3}
-  screenEdgeEffectPrefab: {fileID: 8762405910555896786, guid: fcb74f28d107e284e80af037bfec14ca, type: 3}
-  screenEdgeOffset: 0.05
-  playOnAllEdges: 1
-  playOnEdges: 00000000010000000200000003000000
+  hitPointEffectPrefab: {fileID: 6982263153641847612, guid: 36a3ddd9e9258474aa29a08939eeda45, type: 3}
+  hitEffectDepth: 6
+  hitEffectScale: 1.6
 --- !u!4 &1857077745
 Transform:
   m_ObjectHideFlags: 0

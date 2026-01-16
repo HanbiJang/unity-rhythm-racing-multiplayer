@@ -100,7 +100,8 @@ public class SpawnNode : MonoBehaviour, IClientAction
         // #endregion
 
         // 노드 타입에 따라 다른 노드 스폰 (0: ObjectA, 1: ObjectB, 2: ObjectC, 3: AFail, 4: BFail, 5: CFail)
-        int nodeId = data.NodeType < 3 ? data.NodeType : data.NodeType - 3; // Fail 타입은 일반 노드와 같은 프리팹 사용
+        // Fail 타입은 3번 프리팹 사용
+        int nodeId = data.NodeType < 3 ? data.NodeType : 3;
         
         // #region agent log
         try {

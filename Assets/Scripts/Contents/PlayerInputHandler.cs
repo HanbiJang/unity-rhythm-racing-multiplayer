@@ -7,9 +7,14 @@ public class PlayerInputHandler : MonoBehaviour
     public Vector3 LeftPosition;
     public Vector3 RightPosition;
     public Vector3 MidPosition;
+    
+    [SerializeField, Range(0.1f, 1f)]
+    float m_MoveSpeed = 0.3f;
 
     bool bLeft = false;
     bool bRight = false;
+    
+    Vector3 m_TargetPosition;
 
     void Update()
     {
@@ -28,6 +33,11 @@ public class PlayerInputHandler : MonoBehaviour
             bRight= false;
             bLeft = false;
         }
-        gameObject.transform.position = MidPosition + (bLeft?LeftPosition:Vector3.zero) + (bRight?RightPosition:Vector3.zero);
+        
+        // 목표 위치 계산
+        m_TargetPosition = MidPosition + (bLeft?LeftPosition:Vector3.zero) + (bRight?RightPosition:Vector3.zero);
+        
+        // Lerp를 사용하여 부드럽게 이동
+        gameObject.transform.position = Vector3.Lerp(gameObject.transform.position, m_TargetPosition, m_MoveSpeed);
     }
 }

@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include <iostream>
 #include <memory>
 #include <mutex>
@@ -221,6 +221,7 @@ void Room::CalculateScore(uint64_t userID, uint32_t nodeType)
 {
 	NoteType type = static_cast<NoteType>(nodeType);
 	uint64_t score = 0;
+	uint64_t penalty = 0;
 	int life = 0;
 
 	switch (type)
@@ -235,12 +236,15 @@ void Room::CalculateScore(uint64_t userID, uint32_t nodeType)
 		score = 4500;
 		break;
 	case NoteType::AFail:
+		penalty = 3000;
 		life = -100;
 		break;
 	case NoteType::BFail:
+		penalty = 2000;
 		life = -100;
 		break;
 	case NoteType::CFail:
+		penalty = 4500;
 		life = -300;
 		break;
 	}
@@ -258,7 +262,17 @@ void Room::CalculateScore(uint64_t userID, uint32_t nodeType)
 
 	m_gameStates[userID].life = (m_gameStates[userID].life - life > 0) ? m_gameStates[userID].life - life : 0;
 	int combo = m_gameStates[userID].combo;
-	m_gameStates[userID].score += score * (1.1 + (combo / static_cast<double>(1000)));
+	if (score > 0)
+	{
+		m_gameStates[userID].score += score * (1.1 + (combo / static_cast<double>(1000)));
+	}
+	else if (penalty > 0)
+	{
+		if (m_gameStates[userID].score >= penalty)
+			m_gameStates[userID].score -= penalty;
+		else
+			m_gameStates[userID].score = 0;
+	}
 }
 
 void Room::MakeScoreList()

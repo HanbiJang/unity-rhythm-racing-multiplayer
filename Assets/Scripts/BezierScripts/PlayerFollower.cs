@@ -40,6 +40,11 @@ public class PlayerFollower : PathFollower
         return Mathf.Clamp01(progress);
     }
 
+    [SerializeField, Range(0.1f, 1f)]
+    float m_MoveSpeed = 0.3f;
+    
+    Vector3 m_TargetLocalPosition;
+
     // Update is called once per frame
     protected override void Update()
     {
@@ -51,7 +56,12 @@ public class PlayerFollower : PathFollower
         
         //Vector3 ang = Quaternion.ToEulerAngles(transform.rotation);
         base.Update();
-        ctr.transform.localPosition = new Vector3((ctr.bLeft ? ctr.LeftPosition.x : 0f) + (ctr.bRight ? ctr.RightPosition.x : 0f), 0f,0f);
+        
+        // 목표 위치 계산
+        m_TargetLocalPosition = new Vector3((ctr.bLeft ? ctr.LeftPosition.x : 0f) + (ctr.bRight ? ctr.RightPosition.x : 0f), 0f, 0f);
+        
+        // Lerp를 사용하여 부드럽게 이동
+        ctr.transform.localPosition = Vector3.Lerp(ctr.transform.localPosition, m_TargetLocalPosition, m_MoveSpeed);
         //transform.rotation = Quaternion.Euler(ang.x,ang.y,0);
     }
 }

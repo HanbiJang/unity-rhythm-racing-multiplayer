@@ -32,13 +32,19 @@ public class FloatablePickupScript : PickupScript
             Debug.LogWarning("[FloatablePickupScript] Cannot perform judgment - missing expected time or JudgmentSystem");
         }
 
-        // 타격 지점과 화면 테두리 이펙트 재생
+        // 타격 지점 기반으로 화면에 보이는 위치에 이펙트 재생
         if (HitEffectManager.Instance != null)
         {
             // 타격 지점: 플레이어와 노트의 충돌 지점 (CrusherPosition)
             // 노트의 현재 위치와 플레이어 위치의 중간점 계산
             Vector3 hitPoint = (transform.position + CrusherPosition) * 0.5f;
             HitEffectManager.Instance.PlayAllEffects(hitPoint);
+        }
+        
+        // Fail 타입이면 화면 플래시 이펙트 재생
+        if (nodeType >= 3)
+        {
+            ScreenFlashManager.Instance.PlayFailFeedback();
         }
 
         // 서버로 Judgement 패킷 전송
