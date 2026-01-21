@@ -160,8 +160,11 @@ public class NodeSpwaner : MonoBehaviour
         } catch {}
         // #endregion
         
-        // 경로 위의 왼쪽 위치에 스폰
-        Vector3 spawnPosition = spawnOrigin.position + spawnOrigin.rotation * Vector3.left * 0.5f + spawnOrigin.rotation * Vector3.down * 3;
+        // GameModeManager에서 레인 간격 가져오기
+        float laneOffset = GameModeManager.instance != null ? GameModeManager.instance.laneOffset : 3f;
+        
+        // 경로 위의 왼쪽 위치에 스폰 (laneOffset 사용)
+        Vector3 spawnPosition = spawnOrigin.position + spawnOrigin.rotation * Vector3.left * 0.5f + spawnOrigin.rotation * Vector3.down * laneOffset;
         Quaternion spawnRotation = spawnOrigin.rotation;
         
         GameObject go = Instantiate(m_NodeList[id], spawnPosition, spawnRotation);
@@ -184,8 +187,11 @@ public class NodeSpwaner : MonoBehaviour
         } catch {}
         // #endregion
         
-        // 경로 위의 오른쪽 위치에 스폰
-        Vector3 spawnPosition = spawnOrigin.position + spawnOrigin.rotation * Vector3.left * 0.5f + spawnOrigin.rotation * Vector3.up * 3;
+        // GameModeManager에서 레인 간격 가져오기
+        float laneOffset = GameModeManager.instance != null ? GameModeManager.instance.laneOffset : 3f;
+        
+        // 경로 위의 오른쪽 위치에 스폰 (laneOffset 사용)
+        Vector3 spawnPosition = spawnOrigin.position + spawnOrigin.rotation * Vector3.left * 0.5f + spawnOrigin.rotation * Vector3.up * laneOffset;
         Quaternion spawnRotation = spawnOrigin.rotation;
         
         GameObject go = Instantiate(m_NodeList[id], spawnPosition, spawnRotation);

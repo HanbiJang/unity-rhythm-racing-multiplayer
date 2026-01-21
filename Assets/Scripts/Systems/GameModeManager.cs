@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -19,6 +20,10 @@ public class GameModeManager : MonoBehaviour
     public int totalNoteCount = 0;  // 전체 음악 노트 개수
     public int currentNoteIndex = 0;  // 현재 진행한 노트 인덱스
 
+    [SerializeField, Header("Lane Settings")]
+    [Tooltip("레인 간격 (플레이어 좌우 이동 폭 및 노트 스폰 위치 조절)")]
+    public float laneOffset = 3f;
+
     // Player Info
     public float m_PlayerScore;
     public int m_PlayerMaxHealth;
@@ -32,9 +37,14 @@ public class GameModeManager : MonoBehaviour
     public ObjectSpawner m_ObjectSpawner;
 
     public float m_CurrentTime { get; private set; }
+    bool m_useSyncedClock = false;
+    double m_startUtcSeconds = 0;
 
     public void SetGameOver()
     {
+        if (bGameOver)
+            return;
+
         bGameOver = true;
         m_ObjectSpawner?.StopSpawning();
         
@@ -45,6 +55,8 @@ public class GameModeManager : MonoBehaviour
             ServerInterface.Instance.SendDataToServer(ServerInterface.Instance.SocketConnection, endGameData, (int)EPacketID.EndGame);
             Debug.Log($"Sent EndGame: UserID={GameState.Instance.UserId}, RoomID={GameState.Instance.RoomId}");
         }
+
+        ResultFlow.GoToResult();
     }
 
     public void ResetForLobby()
@@ -54,6 +66,7 @@ public class GameModeManager : MonoBehaviour
         m_PlayerHealth = 0;
         m_PlayerMaxHealth = 0;
         m_CurrentTime = 0f;
+        m_useSyncedClock = false;
 
         // 스포너/런타임 오브젝트 정리
         m_ObjectSpawner?.StopSpawning();
@@ -85,16 +98,41 @@ public class GameModeManager : MonoBehaviour
         bGameOver = false;
     }
 
+    public void SetSyncedStartTime(long startTimeUtcMs)
+    {
+        if (startTimeUtcMs <= 0)
+        {
+            m_useSyncedClock = false;
+            return;
+        }
+
+        m_useSyncedClock = true;
+        m_startUtcSeconds = startTimeUtcMs / 1000.0;
+        m_CurrentTime = 0f;
+    }
+
     // Start is called before the first frame update
     void Awake()
     {
         Screen.SetResolution(1080, 1920, false);
-        if (instance == null)
-            instance = this;
-
+        
+        // 이미 인스턴스가 있으면 새로 생성된 것을 파괴 (싱글톤 패턴)
+        if (instance != null && instance != this)
+        {
+            Debug.LogWarning($"[GameModeManager] Duplicate instance detected. Destroying {gameObject.name}. Using existing instance from {instance.gameObject.name}.");
+            Destroy(gameObject);
+            return;
+        }
+        
+        instance = this;
         DontDestroyOnLoad(gameObject);
 
         Apply();
+
+        if (GameState.Instance != null && GameState.Instance.HasSyncedStartTime)
+        {
+            SetSyncedStartTime(GameState.Instance.SyncedStartTimeUtcMs);
+        }
     }
 
     public void Apply()
@@ -106,9 +144,8 @@ public class GameModeManager : MonoBehaviour
     public bool bGameOver { get; private set; } = false;
     void Update()
     {
+        UpdateCurrentTime();
         if (m_ObjectSpawner == null) return;
-
-        m_CurrentTime += Time.deltaTime;
         if (bGameOver)
             return;
 
@@ -129,5 +166,24 @@ public class GameModeManager : MonoBehaviour
         }
 
 
+    }
+
+    void UpdateCurrentTime()
+    {
+        if (m_useSyncedClock)
+        {
+            double nowSeconds = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() / 1000.0;
+            double elapsed = nowSeconds - m_startUtcSeconds;
+            if (elapsed < 0)
+            {
+                m_CurrentTime = 0f;
+                return;
+            }
+            m_CurrentTime = (float)elapsed;
+        }
+        else
+        {
+            m_CurrentTime += Time.deltaTime;
+        }
     }
 }

@@ -3,6 +3,7 @@
 #include <iostream>
 #include <memory>
 #include <mutex>
+#include <chrono>
 
 #include "Message.h"
 #include "RoomManager.h"
@@ -105,12 +106,18 @@ void HandleReadyGame(Message& msg)
 		return;
 
 	room->SetReady(pkt->userID);
+	if (msg.Header().bodyLength >= sizeof(CReadyGame))
+	{
+		room->SetMatchMode(pkt->matchMode);
+		room->SetNickname(pkt->userID, pkt->nicknamePart1, pkt->nicknamePart2);
+	}
 	std::cout << "[User] " << pkt->userID << " is ready\n";
 	if (room->ReadyCheck())
 	{
 		std::cout << "User All Ready\n";
 
 		Message startGamePacket;
+		const int kStartDelayMs = 2000;
 		uint32_t userCount = room->NumberOfPeople();
 		startGamePacket.PutData(reinterpret_cast<char*>(&userCount), sizeof(uint32_t));
 		uint64_t* userList = room->GetUserList();
@@ -119,12 +126,18 @@ void HandleReadyGame(Message& msg)
 		// 전체 음악 노트 개수 추가
 		uint32_t totalNoteCount = static_cast<uint32_t>(room->GetTotalNoteCount());
 		startGamePacket.PutData(reinterpret_cast<char*>(&totalNoteCount), sizeof(uint32_t));
+
+		// 시작 시각(UTC ms) 추가 - 클라이언트 동기화용
+		auto startSystem = std::chrono::system_clock::now() + std::chrono::milliseconds(kStartDelayMs);
+		int64_t startUtcMs = std::chrono::duration_cast<std::chrono::milliseconds>(
+			startSystem.time_since_epoch()).count();
+		startGamePacket.PutData(reinterpret_cast<char*>(&startUtcMs), sizeof(int64_t));
 		
 		startGamePacket.EncodeHeader(PacketType::StartGame);
 
-		std::cout << "Game Start!! Total Notes: " << totalNoteCount << "\n";
+		std::cout << "Game Start!! Total Notes: " << totalNoteCount << " StartUtcMs: " << startUtcMs << "\n";
 		room->Deliver(startGamePacket);
-		room->Start();
+		room->StartAt(std::chrono::steady_clock::now() + std::chrono::milliseconds(kStartDelayMs));
 	}
 }
 

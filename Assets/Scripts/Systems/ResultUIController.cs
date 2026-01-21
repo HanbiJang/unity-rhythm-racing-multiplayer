@@ -31,7 +31,12 @@ namespace Assets.Scripts
             {
                 var go = Instantiate(rankingItemPrefab, rankingRoot);
                 var labels = go.GetComponentsInChildren<UnityEngine.UI.Text>();
-                labels[0].text = $"User: {kv.Key}";
+                string nickname = null;
+                if (GameState.Instance.UserNicknames != null)
+                {
+                    GameState.Instance.UserNicknames.TryGetValue(kv.Key, out nickname);
+                }
+                labels[0].text = $"User: {(string.IsNullOrEmpty(nickname) ? kv.Key.ToString() : nickname)}";
                 labels[1].text = $"Score: {kv.Value}";
             }
         }

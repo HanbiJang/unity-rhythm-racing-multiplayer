@@ -1,6 +1,7 @@
 #pragma once
 #include <chrono>
 #include <map>
+#include <string>
 
 #include "ContentLoader.h"
 #include "Session.h"
@@ -34,6 +35,11 @@ class Room
 	};
 
 public:
+	enum class MatchMode : uint32_t
+	{
+		Solo = 0,
+		Multi = 1,
+	};
 	struct GameState
 	{
 		uint64_t score;
@@ -53,7 +59,7 @@ public:
 	Room(uint64_t roomID, uint32_t maxSessionCount = MAX_SESSION_SIZE);
 
 	void Join(SessionPtr session);
-	void Start();
+	void StartAt(steady_clock::time_point startTime);
 	void Leave(uint64_t userID);
 	void Deliver(const Message msg);
 	void Broadcast();
@@ -66,6 +72,8 @@ public:
 
 	// contents
 	void SetReady(uint64_t userID);
+	void SetMatchMode(uint32_t matchMode);
+	void SetNickname(uint64_t userID, uint64_t nicknamePart1, uint64_t nicknamePart2);
 	bool ReadyCheck();
 	bool IsStart();
 	void EndGame();
@@ -80,17 +88,25 @@ public:
 	int GetTotalNoteCount() const { return static_cast<int>(m_nodeList.size()); }
 
 private:
+	static std::string DecodeNickname(uint64_t part1, uint64_t part2);
+	static void EncodeNickname(const std::string& nickname, uint64_t& part1, uint64_t& part2);
+
 	uint64_t m_roomID;
 	uint32_t m_maxSessionCount;
 	std::map<uint64_t, SessionPtr> m_sessions;
 	std::map<uint64_t, GameState> m_gameStates;
+	std::map<uint64_t, std::string> m_userNicknames;
 	MsgQueue m_msgQueue;
 
 	bool m_start;
+	bool m_startPending;
+	steady_clock::time_point m_scheduledStart;
+	bool m_matchModeSet;
+	uint32_t m_minPlayers;
 
-	high_resolution_clock::time_point m_startTime;
-	high_resolution_clock::time_point m_curTime;
-	high_resolution_clock::time_point m_preTime;
+	steady_clock::time_point m_startTime;
+	steady_clock::time_point m_curTime;
+	steady_clock::time_point m_preTime;
 
 	std::vector<Node> m_nodeList;
 	int m_nodeIndex;

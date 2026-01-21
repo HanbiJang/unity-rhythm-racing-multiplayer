@@ -4,9 +4,15 @@ using UnityEngine;
 
 public static class ResultFlow
 {
+    static bool s_isResultShown = false;
+
     public static void GoToResult()
     {
         Debug.Log("[ResultFlow] GoToResult() called");
+        if (s_isResultShown)
+        {
+            return;
+        }
         
         // 인게임 UI 숨기기
         if (UIManager.instance != null && UIManager.instance.m_InGameUI != null)
@@ -40,6 +46,7 @@ public static class ResultFlow
         {
             panel.SetActive(true);
             Debug.Log($"[ResultFlow] ResultPanel activated: {panel.name}");
+            s_isResultShown = true;
             
             // ResultUIController가 있으면 Refresh 호출
             var resultController = panel.GetComponent<Assets.Scripts.ResultUIController>();
@@ -62,6 +69,7 @@ public static class ResultFlow
     {
         // 결과 패널 닫고 로비로 이동
         GameModeManager.instance?.ResetForLobby();
+        s_isResultShown = false;
 
         // 로비 씬으로
         UnityEngine.SceneManagement.SceneManager.LoadSceneAsync(0);

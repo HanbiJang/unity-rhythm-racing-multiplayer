@@ -10,6 +10,11 @@ public class DestroyablePickupScript : PickupScript
         if (bPicked) { return; }
 
         bPicked = true;
+
+        if (NodeSfxManager.Instance != null)
+        {
+            NodeSfxManager.Instance.PlayNodeHit(nodeType);
+        }
         
         // 판정 시스템을 사용하여 타이밍 판정
         JudgmentSystem.JudgmentResult judgmentResult = null;
@@ -59,13 +64,15 @@ public class DestroyablePickupScript : PickupScript
             Debug.Log($"Sent Judgement: UserID={GameState.Instance.UserId}, RoomID={GameState.Instance.RoomId}, " +
                      $"NodeType={nodeType}, JudgmentType={judgmentResult?.type}, Score={judgmentResult?.score}");
         }
+
+        Destroy(gameObject);
     }
 
     public override void OnMissed()
     {
         Debug.Log("Missed : " + name);
 
-        Destroy(gameObject, 0.9f);
+        Destroy(gameObject);
     }
 
 }

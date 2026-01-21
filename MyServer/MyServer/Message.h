@@ -72,6 +72,9 @@ struct CReadyGame
 {
 	uint64_t userID;
 	uint64_t roomID;
+	uint32_t matchMode;
+	uint64_t nicknamePart1;
+	uint64_t nicknamePart2;
 };
 struct CJudgement
 {

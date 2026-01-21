@@ -13,22 +13,26 @@ public class PlayerInputController : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetAxisRaw("Horizontal") < 0)
+        // a: 왼쪽 레인, s: 가운데 레인, d: 오른쪽 레인
+        if (Input.GetKeyDown(KeyCode.A))
         {
             bLeft = true;
             bRight = false;
         }
-        if (Input.GetAxisRaw("Horizontal") > 0)
+        else if (Input.GetKeyDown(KeyCode.D))
         {
             bRight = true;
             bLeft = false;
         }
-        if (Mathf.Approximately(Input.GetAxisRaw("Horizontal"), 0f))
+        else if (Input.GetKeyDown(KeyCode.S))
         {
-            bRight = false;
+            // 가운데 레인
             bLeft = false;
+            bRight = false;
         }
 
+        // 이 스크립트는 플레이어 위치 자체는 다른 컴포넌트가 처리할 수 있으므로
+        // 필요하다면 아래 라인을 해제해서 직접 위치를 갱신할 수도 있습니다.
         //transform.position = MidPosition + (bLeft ? LeftPosition : Vector3.zero) + (bRight ? RightPosition : Vector3.zero);
     }
     void OnTriggerEnter(Collider other)

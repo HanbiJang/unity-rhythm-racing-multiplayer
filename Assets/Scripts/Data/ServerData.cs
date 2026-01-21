@@ -104,6 +104,12 @@ public class PacketData : TSData
                         fields[curFieldIdx].SetValue(this, Convert.ToUInt64(obj));
                         size = sizeof(UInt64);
                     }
+                    else if (f.FieldType.Equals(typeof(long)))
+                    {
+                        obj = BitConverter.ToInt64(ByteArr, current_pos);
+                        fields[curFieldIdx].SetValue(this, Convert.ToInt64(obj));
+                        size = sizeof(long);
+                    }
 
                     ++curFieldIdx;
                 }
@@ -197,6 +203,7 @@ public class PacketData : TSData
                 sizeOfField = Marshal.SizeOf(f.FieldType); //주의***
                 if (f.FieldType.Equals(typeof(int))) { buffer = BitConverter.GetBytes((int)f.GetValue(this)); }
                 else if (f.FieldType.Equals(typeof(UInt64))) { buffer = BitConverter.GetBytes((UInt64)f.GetValue(this)); }
+                else if (f.FieldType.Equals(typeof(long))) { buffer = BitConverter.GetBytes((long)f.GetValue(this)); }
                 else if (f.FieldType.Equals(typeof(float))) { buffer = BitConverter.GetBytes((float)f.GetValue(this)); }
                 
                 if (buffer != null)
@@ -225,6 +232,7 @@ public class PacketData : TSData
         {
             if (f.FieldType.Equals(typeof(int))) size += sizeof(int); //주의***
             else if (f.FieldType.Equals(typeof(UInt64))) size += sizeof(UInt64);
+            else if (f.FieldType.Equals(typeof(long))) size += sizeof(long);
             else if (f.FieldType.Equals(typeof(float))) size += sizeof(float);
             else if (f.FieldType.Equals(typeof(List<KeyValuePair<int, int>>)))
             {
@@ -266,20 +274,32 @@ public class ReadyGameData : PacketData
 {
     UInt64 _userID;
     UInt64 _roomID;
+    int _matchMode;
+    UInt64 _nicknamePart1;
+    UInt64 _nicknamePart2;
 
     public UInt64 userID { get { return _userID; } set { _userID = value; } }
     public UInt64 roomID { get { return _roomID; } set { _roomID = value; } }
+    public int matchMode { get { return _matchMode; } set { _matchMode = value; } }
+    public UInt64 nicknamePart1 { get { return _nicknamePart1; } set { _nicknamePart1 = value; } }
+    public UInt64 nicknamePart2 { get { return _nicknamePart2; } set { _nicknamePart2 = value; } }
 
     //생성자
     public ReadyGameData()
     {
         _userID = 0;
         _roomID = 0;
+        _matchMode = 0;
+        _nicknamePart1 = 0;
+        _nicknamePart2 = 0;
     }
-    public ReadyGameData(UInt64 userID_, UInt64 roomID_)
+    public ReadyGameData(UInt64 userID_, UInt64 roomID_, int matchMode_ = 0, UInt64 nicknamePart1_ = 0, UInt64 nicknamePart2_ = 0)
     {
         _userID = userID_;
         _roomID = roomID_;
+        _matchMode = matchMode_;
+        _nicknamePart1 = nicknamePart1_;
+        _nicknamePart2 = nicknamePart2_;
     }
 }
 
@@ -399,10 +419,12 @@ public class StartGameData : PacketData
     int userCount;
     List<UInt64> userIds;
     int totalNoteCount;  // 전체 음악 노트 개수
+    long startTimeUtcMs; // 동기화 시작 시각 (UTC ms)
 
     public int UserCount { get { return userCount; } set { userCount = value; } }
     public List<UInt64> UserIds { get { return userIds; } set { userIds = value; } }
     public int TotalNoteCount { get { return totalNoteCount; } set { totalNoteCount = value; } }
+    public long StartTimeUtcMs { get { return startTimeUtcMs; } set { startTimeUtcMs = value; } }
 
     //생성자
     public StartGameData()
@@ -410,12 +432,14 @@ public class StartGameData : PacketData
         userCount = 0;
         userIds = new List<ulong>();
         totalNoteCount = 0;
+        startTimeUtcMs = 0;
     }
-    public StartGameData(int userCount_, List<UInt64> roomID_, int totalNoteCount_ = 0)
+    public StartGameData(int userCount_, List<UInt64> roomID_, int totalNoteCount_ = 0, long startTimeUtcMs_ = 0)
     {
         userCount = userCount_;
         userIds = roomID_;
         totalNoteCount = totalNoteCount_;
+        startTimeUtcMs = startTimeUtcMs_;
     }
 
     // StartGameData는 커스텀 파싱 필요 (List 뒤에 int가 있으므로)
@@ -442,6 +466,13 @@ public class StartGameData : PacketData
         if (offset + sizeof(int) <= ByteArr.Length)
         {
             totalNoteCount = BitConverter.ToInt32(ByteArr, offset);
+            offset += sizeof(int);
+        }
+
+        // startTimeUtcMs 읽기 (있으면)
+        if (offset + sizeof(long) <= ByteArr.Length)
+        {
+            startTimeUtcMs = BitConverter.ToInt64(ByteArr, offset);
         }
 
         return this;
@@ -477,19 +508,68 @@ public class ScoreBroadcastData : PacketData
 {
     int _userCount;
     List<KeyValuePair<ulong, ulong>> _scoreLIst;
+    List<ScoreEntry> _entries;
 
     public int UserCount { get { return _userCount; } set { _userCount = value; } }
     public List<KeyValuePair<ulong, ulong>> ScoreLIst { get { return _scoreLIst; } set { _scoreLIst = value; } }
+    public List<ScoreEntry> Entries { get { return _entries; } set { _entries = value; } }
 
     //생성자
     public ScoreBroadcastData()
     {
         _userCount = 0;
         _scoreLIst = new List<KeyValuePair<ulong, ulong>>();
+        _entries = new List<ScoreEntry>();
     }
     public ScoreBroadcastData(int userCount_, List<KeyValuePair<ulong, ulong>> scoreLIst_)
     {
         _userCount = userCount_;
         _scoreLIst = scoreLIst_;
+        _entries = new List<ScoreEntry>();
+    }
+
+    public new PacketData ConvertToGameData(byte[] ByteArr)
+    {
+        int offset = 0;
+        _scoreLIst = new List<KeyValuePair<ulong, ulong>>();
+        _entries = new List<ScoreEntry>();
+
+        if (offset + sizeof(int) > ByteArr.Length) return this;
+        _userCount = BitConverter.ToInt32(ByteArr, offset);
+        offset += sizeof(int);
+
+        for (int i = 0; i < _userCount; i++)
+        {
+            if (offset + sizeof(ulong) * 4 > ByteArr.Length) break;
+
+            ulong userId = BitConverter.ToUInt64(ByteArr, offset);
+            offset += sizeof(ulong);
+            ulong score = BitConverter.ToUInt64(ByteArr, offset);
+            offset += sizeof(ulong);
+            ulong namePart1 = BitConverter.ToUInt64(ByteArr, offset);
+            offset += sizeof(ulong);
+            ulong namePart2 = BitConverter.ToUInt64(ByteArr, offset);
+            offset += sizeof(ulong);
+
+            string nickname = GameState.DecodeNickname(namePart1, namePart2);
+            _entries.Add(new ScoreEntry(userId, score, nickname));
+            _scoreLIst.Add(new KeyValuePair<ulong, ulong>(userId, score));
+        }
+
+        return this;
+    }
+}
+
+public class ScoreEntry
+{
+    public ulong UserId { get; private set; }
+    public ulong Score { get; private set; }
+    public string Nickname { get; private set; }
+
+    public ScoreEntry(ulong userId, ulong score, string nickname)
+    {
+        UserId = userId;
+        Score = score;
+        Nickname = nickname;
     }
 }

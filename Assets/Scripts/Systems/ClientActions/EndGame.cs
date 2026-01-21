@@ -31,6 +31,18 @@ public class EndGame : MonoBehaviour, IClientAction
         // 2) 결과 데이터 갱신 (이미 주기적 ScoreBroadcast로도 받음)
         //    결과씬/패널에서 GameState.Instance.ScoreLIst를 사용
 
+        // 2-1) 음악 즉시 중지
+        SoundManager soundManager = FindObjectOfType<SoundManager>();
+        if (soundManager != null)
+        {
+            soundManager.StopMusic();
+        }
+        NodeSfxManager nodeSfxManager = FindObjectOfType<NodeSfxManager>();
+        if (nodeSfxManager != null)
+        {
+            nodeSfxManager.StopAllSfx();
+        }
+
         // 3) 결과 화면으로 전환 (오버레이 패널)
         ResultFlow.GoToResult();
     }

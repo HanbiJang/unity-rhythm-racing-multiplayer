@@ -16,6 +16,17 @@ public class ScoreBroadcast : MonoBehaviour, IClientAction
 
         GameState.Instance.UserCount = data.UserCount;
         GameState.Instance.ScoreLIst = data.ScoreLIst;
+        if (data.Entries != null)
+        {
+            if (GameState.Instance.UserNicknames == null)
+            {
+                GameState.Instance.UserNicknames = new Dictionary<ulong, string>();
+            }
+            foreach (var entry in data.Entries)
+            {
+                GameState.Instance.UserNicknames[entry.UserId] = entry.Nickname;
+            }
+        }
 
         // 서버에서 계산한 점수를 GameModeManager에 동기화
         if (GameModeManager.instance != null && data.ScoreLIst != null)
@@ -47,6 +58,10 @@ public class ScoreBroadcast : MonoBehaviour, IClientAction
             {
                 GameState.Instance.ScoreLIst = new List<KeyValuePair<ulong, ulong>>();
             }
+            if (GameState.Instance.UserNicknames == null)
+            {
+                GameState.Instance.UserNicknames = new Dictionary<ulong, string>();
+            }
             
             // 기존 점수 업데이트 또는 추가
             bool found = false;
@@ -64,6 +79,8 @@ public class ScoreBroadcast : MonoBehaviour, IClientAction
             {
                 GameState.Instance.ScoreLIst.Add(new KeyValuePair<ulong, ulong>(GameState.Instance.UserId, (ulong)score));
             }
+
+            GameState.Instance.UserNicknames[GameState.Instance.UserId] = GameState.Instance.PlayerNickname;
             
             GameState.Instance.UserCount = GameState.Instance.ScoreLIst.Count;
         }

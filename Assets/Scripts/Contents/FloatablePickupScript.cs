@@ -12,7 +12,10 @@ public class FloatablePickupScript : PickupScript
         rb.useGravity = true;
         rb.AddForceAtPosition(new Vector3(Random.Range(1000f,-1000f), 3000f, Random.Range(1000f, -1000f)),CrusherPosition);
         bPicked = true;
-        //SoundManager.instance.PlaySound(me);
+        if (NodeSfxManager.Instance != null)
+        {
+            NodeSfxManager.Instance.PlayNodeHit(nodeType);
+        }
         //GameModeManager.instance.m_PlayerScore += 3000;
         //
 
@@ -65,13 +68,13 @@ public class FloatablePickupScript : PickupScript
                      $"NodeType={nodeType}, JudgmentType={judgmentResult?.type}, Score={judgmentResult?.score}");
         }
 
-        Destroy(gameObject, 0.7f);
+        Destroy(gameObject);
     }
 
     public override void OnMissed()
     {
         Debug.Log("Missed : "+name);
 
-        Destroy(gameObject, 0.9f);
+        Destroy(gameObject);
     }
 }

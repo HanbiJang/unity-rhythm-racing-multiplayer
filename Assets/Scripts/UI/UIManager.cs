@@ -33,10 +33,22 @@ public class UIManager : MonoBehaviour
     [SerializeField]
     GameObject LoadingScene;
 
+    [SerializeField, Header("Nickname Input (Multi Only)")]
+    InputField m_NicknameInput;
+
 
     // Update is called once per frame
     void Update()
     {
+        if (Input.GetKeyDown(KeyCode.Alpha1))
+        {
+            BtnStartSolo();
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            BtnStartMulti();
+        }
+
         // StartScene에서는 InGame UI를 업데이트하지 않음
         // Road 씬의 InGameUIController가 자체적으로 업데이트함
         if (m_InGameUI == null || m_InGameUI.active == false)
@@ -61,12 +73,43 @@ public class UIManager : MonoBehaviour
     /// </summary>
     public void BtnStart()
     {
-        ShowLoading(); //로딩 화면을 보여주고
-
-        ServerInterface.Instance.ConnectToTcpServer(GameState.Instance.Ip, GameState.Instance.PortNum);
+        StartGameWithMode(GameState.EMatchMode.Multi);
 
         //테스트 코드, (서버에서 데이터를 받았다고 치고) 임의로 5초 뒤에 Join 동작을, 다시 5초 뒤에 Start 동작을 실행함
         //StartCoroutine(testCo());
+    }
+
+    public void BtnStartSolo()
+    {
+        StartGameWithMode(GameState.EMatchMode.Solo);
+    }
+
+    public void BtnStartMulti()
+    {
+        StartGameWithMode(GameState.EMatchMode.Multi);
+    }
+
+    void StartGameWithMode(GameState.EMatchMode mode)
+    {
+        GameState.Instance.MatchMode = mode;
+        GameState.Instance.PlayerNickname = GetNicknameForMode(mode);
+        if (mode == GameState.EMatchMode.Multi)
+        {
+            ShowLoading(); // 멀티만 매칭 대기 로딩 표시
+        }
+        else
+        {
+            HideLoading();
+        }
+
+        ServerInterface.Instance.ConnectToTcpServer(GameState.Instance.Ip, GameState.Instance.PortNum);
+    }
+
+    string GetNicknameForMode(GameState.EMatchMode mode)
+    {
+        string nickname = m_NicknameInput != null ? m_NicknameInput.text : string.Empty;
+        nickname = nickname != null ? nickname.Trim() : string.Empty;
+        return string.IsNullOrEmpty(nickname) ? "Player" : nickname;
     }
     
     /// <summary>
@@ -92,6 +135,7 @@ public class UIManager : MonoBehaviour
         yield return new WaitForSeconds(3f);
         ServerInterface.Instance.ClientAction((int)EPacketID.StartGame, ServerInterface.Instance.SocketConnection, new byte[16]);
     }
+
 
     //로딩 UI를 보여줌
     public void ShowLoading()

@@ -86,6 +86,12 @@ public class SpawnNode : MonoBehaviour, IClientAction
             }
         }
 
+        // 빌드에서는 EditorOnly 오브젝트가 제거될 수 있으므로 직접 탐색
+        if (ns == null)
+        {
+            ns = FindObjectOfType<NodeSpwaner>();
+        }
+
         if (ns == null)
         {
             Debug.LogWarning("NodeSpwaner not found! Scene might still be loading. Skipping node spawn.");

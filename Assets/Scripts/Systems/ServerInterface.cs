@@ -315,11 +315,12 @@ public class ServerInterface : MonoBehaviour
         startData.UserCount = 1;
         startData.UserIds = new List<ulong> { GameState.Instance.UserId };
         startData.TotalNoteCount = 100;  // 테스트 모드용 기본값 (실제로는 서버에서 받아야 함)
+        startData.StartTimeUtcMs = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() + 1000;
         
         byte[] startBytes = startData.ConvertToByte();
         ClientAction((int)EPacketID.StartGame, socketConnection, startBytes);
         
-        Debug.Log($"[Test Mode] Simulated StartGame (1인 플레이, Total Notes: {startData.TotalNoteCount})");
+        Debug.Log($"[Test Mode] Simulated StartGame (1인 플레이, Total Notes: {startData.TotalNoteCount}, StartUtcMs: {startData.StartTimeUtcMs})");
     }
 
 
@@ -564,7 +565,16 @@ public class ServerInterface : MonoBehaviour
             if (gameSceneLoadAsync.progress >= 0.9f)
             {
                 Debug.Log("Scene Load isDone");
-                ReadyGameData readyGameData = new ReadyGameData(GameState.Instance.UserId, GameState.Instance.RoomId); //GameState에 있는 데이터를 전송    
+                ulong nicknamePart1;
+                ulong nicknamePart2;
+                GameState.EncodeNickname(GameState.Instance.PlayerNickname, out nicknamePart1, out nicknamePart2);
+
+                ReadyGameData readyGameData = new ReadyGameData(
+                    GameState.Instance.UserId,
+                    GameState.Instance.RoomId,
+                    (int)GameState.Instance.MatchMode,
+                    nicknamePart1,
+                    nicknamePart2); //GameState에 있는 데이터를 전송    
                 ServerInterface.Instance.SendDataToServer(ServerInterface.Instance.SocketConnection, readyGameData, (int)EPacketID.ReadyGame);
                 yield break;
             }

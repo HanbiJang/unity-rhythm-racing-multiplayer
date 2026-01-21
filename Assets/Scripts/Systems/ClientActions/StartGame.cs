@@ -16,13 +16,26 @@ public class StartGame : MonoBehaviour, IClientAction
         data.ConvertToGameData(byteData);
         Debug.Log("UserID " + data.UserCount + "UserIds.Count " + data.UserIds.Count);
         Debug.Log("Total Note Count: " + data.TotalNoteCount);
+        Debug.Log("Start Time (UTC ms): " + data.StartTimeUtcMs);
 
         // GameModeManager에 전체 노트 개수 저장
         if (GameModeManager.instance != null)
         {
             GameModeManager.instance.totalNoteCount = data.TotalNoteCount;
             GameModeManager.instance.currentNoteIndex = 0;  // 초기화
+            GameModeManager.instance.SetSyncedStartTime(data.StartTimeUtcMs);
             Debug.Log($"GameModeManager: Total Notes = {GameModeManager.instance.totalNoteCount}");
+        }
+        
+        // 전역에 시작 시각 저장 (씬 로딩 이후 SoundManager가 읽을 수 있도록)
+        GameState.Instance.SyncedStartTimeUtcMs = data.StartTimeUtcMs;
+        GameState.Instance.HasSyncedStartTime = data.StartTimeUtcMs > 0;
+
+        // 이미 SoundManager가 있으면 즉시 동기 재생 예약
+        SoundManager soundManager = FindObjectOfType<SoundManager>();
+        if (soundManager != null && data.StartTimeUtcMs > 0)
+        {
+            soundManager.StartSyncedPlayback(data.StartTimeUtcMs);
         }
 
         //게임을 시작       
