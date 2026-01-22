@@ -141,7 +141,8 @@ void Room::Update()
 
 	if (!m_progressEnd && m_nodeIndex < m_nodeList.size() && progressTime >= m_nodeList[m_nodeIndex].time)
 	{
-		SpawnNode(static_cast<NoteType>(m_nodeList[m_nodeIndex].type), static_cast<NotePos>(m_nodeList[m_nodeIndex].pos));
+		uint32_t nodeTimeMs = static_cast<uint32_t>(m_nodeList[m_nodeIndex].time.count());
+		SpawnNode(static_cast<NoteType>(m_nodeList[m_nodeIndex].type), static_cast<NotePos>(m_nodeList[m_nodeIndex].pos), nodeTimeMs);
 		++m_nodeIndex;
 
 		if (m_nodeIndex == m_nodeList.size())
@@ -306,34 +307,56 @@ uint64_t* Room::GetUserList()
 	return userList;
 }
 
-void Room::SpawnNode(NoteType type, NotePos pos)
+void Room::SpawnNode(NoteType type, NotePos pos, uint32_t nodeTimeMs)
 {
 	Message msg;
 	msg.PutData(reinterpret_cast<char*>(&type), sizeof(NoteType));
 	msg.PutData(reinterpret_cast<char*>(&pos), sizeof(NotePos));
+	msg.PutData(reinterpret_cast<char*>(&nodeTimeMs), sizeof(uint32_t));
 	msg.EncodeHeader(PacketType::SpawnNode);
 
 	Deliver(msg);
-	std::cout << "[room: " << m_roomID << "] SpawnNode Type: " << static_cast<int>(type) << " Pos: " << static_cast<int>(pos) << " Index: "  << m_nodeIndex << "\n";
+	std::cout << "[room: " << m_roomID << "] SpawnNode Type: " << static_cast<int>(type) << " Pos: " << static_cast<int>(pos) << " TimeMs: " << nodeTimeMs << " Index: "  << m_nodeIndex << "\n";
 }
 
-void Room::CalculateScore(uint64_t userID, uint32_t nodeType)
+void Room::CalculateScore(uint64_t userID, uint32_t nodeType, uint32_t judgmentType, float timeDifference, int32_t judgmentScore)
 {
 	NoteType type = static_cast<NoteType>(nodeType);
 	uint64_t score = 0;
 	uint64_t penalty = 0;
 	int life = 0;
 
+	// 판정 타입에 따른 점수 배율 (Perfect: 1.0, Good: 0.7, Bad: 0.3, Miss: 0.0)
+	double judgmentMultiplier = 1.0;
+	switch (judgmentType)
+	{
+	case 0: // Perfect
+		judgmentMultiplier = 1.0;
+		break;
+	case 1: // Good
+		judgmentMultiplier = 0.7;
+		break;
+	case 2: // Bad
+		judgmentMultiplier = 0.3;
+		break;
+	case 3: // Miss
+		judgmentMultiplier = 0.0;
+		break;
+	default:
+		judgmentMultiplier = 1.0; // 기본값 (판정 정보가 없는 경우)
+		break;
+	}
+
 	switch (type)
 	{
 	case NoteType::ObjectA:
-		score = 3000;
+		score = static_cast<uint64_t>(3000 * judgmentMultiplier);
 		break;
 	case NoteType::ObjectB:
-		score = 2000;
+		score = static_cast<uint64_t>(2000 * judgmentMultiplier);
 		break;
 	case NoteType::ObjectC:
-		score = 4500;
+		score = static_cast<uint64_t>(4500 * judgmentMultiplier);
 		break;
 	case NoteType::AFail:
 		penalty = 3000;
@@ -353,7 +376,13 @@ void Room::CalculateScore(uint64_t userID, uint32_t nodeType)
 
 	if (type < NoteType::AFail)
 	{
-		++m_gameStates[userID].combo;
+		// Perfect와 Good만 콤보 유지, Bad와 Miss는 콤보 초기화  // Perfect(0) or Good(1)
+		if(judgmentType <= 1)
+			++m_gameStates[userID].combo;
+		else // Bad(2) or Miss(3)
+		{
+			m_gameStates[userID].combo = 0;
+		}
 	}
 	else
 	{
@@ -364,7 +393,7 @@ void Room::CalculateScore(uint64_t userID, uint32_t nodeType)
 	int combo = m_gameStates[userID].combo;
 	if (score > 0)
 	{
-		m_gameStates[userID].score += score * (1.1 + (combo / static_cast<double>(1000)));
+		m_gameStates[userID].score += static_cast<uint64_t>(score * (1.1 + (combo / static_cast<double>(1000))));
 	}
 	else if (penalty > 0)
 	{

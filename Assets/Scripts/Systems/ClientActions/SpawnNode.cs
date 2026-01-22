@@ -7,52 +7,100 @@ public class SpawnNode : MonoBehaviour, IClientAction
 {
     /// <summary>
     /// 노트가 플레이어에게 도달하는 예상 시간을 계산합니다.
+    /// 서버에서 받은 노트 타이밍 정보를 사용합니다.
     /// </summary>
-    private float CalculateExpectedTime(GameObject node)
+    private float CalculateExpectedTime(GameObject node, int nodeTimeMs)
     {
+        // #region agent log
+        try {
+            string logEntry = $"{{\"sessionId\":\"debug-session\",\"runId\":\"run1\",\"hypothesisId\":\"H1\",\"location\":\"SpawnNode.cs:CalculateExpectedTime\",\"message\":\"CalculateExpectedTime entry\",\"data\":{{\"nodeTimeMs\":{nodeTimeMs}}},\"timestamp\":{System.DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()}}}\n";
+            System.IO.File.AppendAllText(@"d:\GitRepo\Unity Racing Game\.cursor\debug.log", logEntry);
+        } catch {}
+        // #endregion
+        
         if (GameModeManager.instance == null)
         {
             Debug.LogWarning("[SpawnNode] GameModeManager is null, using current time as expected time");
             return 0f;
         }
 
-        // 현재 게임 시간
-        float currentTime = GameModeManager.instance.m_CurrentTime;
+        // 서버에서 받은 노트 타이밍을 초 단위로 변환
+        float serverNoteTime = nodeTimeMs / 1000f;
 
-        // SpwanerFollower 찾기
+        // SpwanerFollower 찾기 (노트와 플레이어 사이의 거리와 속도를 얻기 위해)
         SpwanerFollower spawnerFollower = FindObjectOfType<SpwanerFollower>();
+        
+        // #region agent log
+        try {
+            string logEntry = $"{{\"sessionId\":\"debug-session\",\"runId\":\"run1\",\"hypothesisId\":\"H2\",\"location\":\"SpawnNode.cs:CalculateExpectedTime\",\"message\":\"SpwanerFollower search\",\"data\":{{\"spawnerFollowerFound\":{(spawnerFollower != null).ToString().ToLower()},\"serverNoteTime\":{serverNoteTime}}},\"timestamp\":{System.DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()}}}\n";
+            System.IO.File.AppendAllText(@"d:\GitRepo\Unity Racing Game\.cursor\debug.log", logEntry);
+        } catch {}
+        // #endregion
+        
         if (spawnerFollower == null)
         {
-            Debug.LogWarning("[SpawnNode] SpwanerFollower not found, using current time as expected time");
-            return currentTime;
-        }
-
-        // 노트의 PathFollower 찾기
-        PathFollower nodeFollower = node.GetComponent<PathFollower>();
-        if (nodeFollower == null)
-        {
-            Debug.LogWarning("[SpawnNode] Node doesn't have PathFollower, using current time as expected time");
-            return currentTime;
+            Debug.LogWarning("[SpawnNode] SpwanerFollower not found, using server note time");
+            // #region agent log
+            try {
+                string logEntry = $"{{\"sessionId\":\"debug-session\",\"runId\":\"run1\",\"hypothesisId\":\"H2\",\"location\":\"SpawnNode.cs:CalculateExpectedTime\",\"message\":\"SpwanerFollower not found\",\"data\":{{\"serverNoteTime\":{serverNoteTime}}},\"timestamp\":{System.DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()}}}\n";
+                System.IO.File.AppendAllText(@"d:\GitRepo\Unity Racing Game\.cursor\debug.log", logEntry);
+            } catch {}
+            // #endregion
+            return serverNoteTime;
         }
 
         // 노트와 플레이어 사이의 거리 계산
-        // SpwanerFollower가 플레이어보다 앞서 있는 거리를 가져옴
         float gapDistance = spawnerFollower.GapBetweenPlayer;
 
-        // 노트의 이동 속도
-        float nodeSpeed = nodeFollower.speed;
+        // 노트의 이동 속도 - PathFollower를 찾지 못하면 SpwanerFollower의 속도를 사용
+        // (노트와 스포너는 같은 속도로 이동하므로)
+        float nodeSpeed = spawnerFollower.speed;
+        
+        // PathFollower가 있으면 그것을 우선 사용 (스폰 직후에는 없을 수 있으므로 폴백)
+        PathFollower nodeFollower = node.GetComponent<PathFollower>();
+        
+        // #region agent log
+        try {
+            string logEntry = $"{{\"sessionId\":\"debug-session\",\"runId\":\"run1\",\"hypothesisId\":\"H2\",\"location\":\"SpawnNode.cs:CalculateExpectedTime\",\"message\":\"PathFollower check\",\"data\":{{\"nodeFollowerFound\":{(nodeFollower != null).ToString().ToLower()},\"nodeFollowerSpeed\":{(nodeFollower != null ? nodeFollower.speed : 0)},\"spawnerSpeed\":{spawnerFollower.speed}}},\"timestamp\":{System.DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()}}}\n";
+            System.IO.File.AppendAllText(@"d:\GitRepo\Unity Racing Game\.cursor\debug.log", logEntry);
+        } catch {}
+        // #endregion
+        
+        if (nodeFollower != null && nodeFollower.speed > 0f)
+        {
+            nodeSpeed = nodeFollower.speed;
+        }
+        
         if (nodeSpeed <= 0f)
         {
-            Debug.LogWarning("[SpawnNode] Node speed is 0 or negative, using default calculation");
-            // 기본값으로 대략적인 시간 계산 (예: 2초)
-            return currentTime + 2f;
+            Debug.LogWarning("[SpawnNode] Node speed is 0 or negative, using server note time");
+            // #region agent log
+            try {
+                string logEntry = $"{{\"sessionId\":\"debug-session\",\"runId\":\"run1\",\"hypothesisId\":\"H2\",\"location\":\"SpawnNode.cs:CalculateExpectedTime\",\"message\":\"Node speed invalid\",\"data\":{{\"nodeSpeed\":{nodeSpeed},\"spawnerSpeed\":{spawnerFollower.speed},\"serverNoteTime\":{serverNoteTime}}},\"timestamp\":{System.DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()}}}\n";
+                System.IO.File.AppendAllText(@"d:\GitRepo\Unity Racing Game\.cursor\debug.log", logEntry);
+            } catch {}
+            // #endregion
+            return serverNoteTime;
         }
 
         // 노트가 플레이어에게 도달하는 데 걸리는 시간
         float timeToReachPlayer = gapDistance / nodeSpeed;
 
-        // 예상 타이밍 = 현재 시간 + 도달 시간
-        float expectedTime = currentTime + timeToReachPlayer;
+        // 예상 타이밍 = 서버 노트 타이밍 + 도달 시간
+        // 서버 노트 타이밍은 게임 시작 후 경과 시간이므로, 도달 시간을 더하면 됩니다
+        float expectedTime = serverNoteTime + timeToReachPlayer;
+
+        // 디버그 로그
+        float currentTime = GameModeManager.instance.m_CurrentTime;
+        Debug.Log($"[SpawnNode] NodeTimeMs: {nodeTimeMs}, ServerNoteTime: {serverNoteTime:F3}s, " +
+                 $"GapDistance: {gapDistance:F2}, NodeSpeed: {nodeSpeed:F2}, TimeToReach: {timeToReachPlayer:F3}s, ExpectedTime: {expectedTime:F3}s, CurrentTime: {currentTime:F3}s");
+
+        // #region agent log
+        try {
+            string logEntry = $"{{\"sessionId\":\"debug-session\",\"runId\":\"run1\",\"hypothesisId\":\"H2\",\"location\":\"SpawnNode.cs:CalculateExpectedTime\",\"message\":\"CalculateExpectedTime result\",\"data\":{{\"nodeTimeMs\":{nodeTimeMs},\"serverNoteTime\":{serverNoteTime},\"gapDistance\":{gapDistance},\"nodeSpeed\":{nodeSpeed},\"timeToReachPlayer\":{timeToReachPlayer},\"expectedTime\":{expectedTime},\"currentTime\":{currentTime}}},\"timestamp\":{System.DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()}}}\n";
+            System.IO.File.AppendAllText(@"d:\GitRepo\Unity Racing Game\.cursor\debug.log", logEntry);
+        } catch {}
+        // #endregion
 
         return expectedTime;
     }
@@ -65,6 +113,13 @@ public class SpawnNode : MonoBehaviour, IClientAction
         SpawnNodeData data = new SpawnNodeData();
         data.ConvertToGameData(byteData);
         Debug.Log("NodeType " + data.NodeType + "NodePos " + data.NodePos);
+        
+        // #region agent log
+        try {
+            string logEntry = $"{{\"sessionId\":\"debug-session\",\"runId\":\"run1\",\"hypothesisId\":\"H1\",\"location\":\"SpawnNode.cs:Do\",\"message\":\"Received SpawnNodeData from server\",\"data\":{{\"nodeType\":{data.NodeType},\"nodePos\":{data.NodePos},\"nodeTimeMs\":{data.NodeTimeMs}}},\"timestamp\":{System.DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()}}}\n";
+            System.IO.File.AppendAllText(@"d:\GitRepo\Unity Racing Game\.cursor\debug.log", logEntry);
+        } catch {}
+        // #endregion
 
         // #region agent log
         try {
@@ -168,13 +223,11 @@ public class SpawnNode : MonoBehaviour, IClientAction
                 ps.nodeType = data.NodeType;
                 
                 // 예상 타이밍 계산
-                // 노트가 플레이어에게 도달하는 시간을 계산
-                // SpwanerFollower는 플레이어보다 GapBetweenPlayer만큼 앞서 있음
-                // 노트의 이동 속도는 PathFollower의 speed를 사용
-                float expectedTime = CalculateExpectedTime(spawnedNode);
+                // 서버에서 받은 노트 타이밍 정보를 사용하여 계산
+                float expectedTime = CalculateExpectedTime(spawnedNode, data.NodeTimeMs);
                 ps.SetExpectedTime(expectedTime);
                 
-                Debug.Log($"[SpawnNode] Node spawned with expected time: {expectedTime:F2}s, NodeType: {data.NodeType}, NodePos: {data.NodePos}");
+                Debug.Log($"[SpawnNode] Node spawned with expected time: {expectedTime:F3}s, NodeType: {data.NodeType}, NodePos: {data.NodePos}, NodeTimeMs: {data.NodeTimeMs}");
             }
         }
 

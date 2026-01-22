@@ -95,6 +95,12 @@ public class GameModeManager : MonoBehaviour
             UIManager.instance.m_InGameUI.SetActive(true);
         }
 
+        // 콤보 초기화
+        if (ComboTracker.Instance != null)
+        {
+            ComboTracker.Instance.ResetForNewGame();
+        }
+
         bGameOver = false;
     }
 
@@ -177,6 +183,12 @@ public class GameModeManager : MonoBehaviour
             if (elapsed < 0)
             {
                 m_CurrentTime = 0f;
+                // #region agent log
+                try {
+                    string logEntry = $"{{\"sessionId\":\"debug-session\",\"runId\":\"run1\",\"hypothesisId\":\"H3\",\"location\":\"GameModeManager.cs:UpdateCurrentTime\",\"message\":\"Negative elapsed time\",\"data\":{{\"nowSeconds\":{nowSeconds},\"m_startUtcSeconds\":{m_startUtcSeconds},\"elapsed\":{elapsed}}},\"timestamp\":{System.DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()}}}\n";
+                    System.IO.File.AppendAllText(@"d:\GitRepo\Unity Racing Game\.cursor\debug.log", logEntry);
+                } catch {}
+                // #endregion
                 return;
             }
             m_CurrentTime = (float)elapsed;
@@ -185,5 +197,14 @@ public class GameModeManager : MonoBehaviour
         {
             m_CurrentTime += Time.deltaTime;
         }
+        
+        // #region agent log (주기적으로 시간 확인 - 1초마다만)
+        try {
+            if (Time.frameCount % 60 == 0) { // 약 1초마다
+                string logEntry = $"{{\"sessionId\":\"debug-session\",\"runId\":\"run1\",\"hypothesisId\":\"H3\",\"location\":\"GameModeManager.cs:UpdateCurrentTime\",\"message\":\"Current time update\",\"data\":{{\"m_CurrentTime\":{m_CurrentTime},\"m_useSyncedClock\":{m_useSyncedClock.ToString().ToLower()},\"m_startUtcSeconds\":{m_startUtcSeconds}}},\"timestamp\":{System.DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()}}}\n";
+                System.IO.File.AppendAllText(@"d:\GitRepo\Unity Racing Game\.cursor\debug.log", logEntry);
+            }
+        } catch {}
+        // #endregion
     }
 }

@@ -81,6 +81,9 @@ struct CJudgement
 	uint64_t userID;
 	uint64_t roomID;
 	uint32_t nodeType;
+	uint32_t judgmentType;  // 판정 타입 (0: Perfect, 1: Good, 2: Bad, 3: Miss)
+	float timeDifference;   // 예상 타이밍과의 차이 (초)
+	int32_t score;          // 판정 점수
 };
 struct CRetryGame
 {
@@ -106,6 +109,7 @@ struct CSpawnNode
 {
 	uint32_t nodeType;
 	uint32_t nodePos;
+	uint32_t nodeTimeMs;  // 노트의 타이밍 (게임 시작 후 경과 시간, 밀리초)
 };
 struct CScoreBroadcast
 {

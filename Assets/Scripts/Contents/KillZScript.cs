@@ -11,10 +11,19 @@ public class KillZScript : MonoBehaviour
     {
         if (other.CompareTag("PickupItem")) 
         {
+            PickupScript pickupScript = other.gameObject.GetComponent<PickupScript>();
+            if (pickupScript != null && !pickupScript.bPicked)
+            {
+                Debug.Log(name + " : PickupItem trigger (Miss)");
+                // 노트를 놓쳤을 때 OnMissed 호출하여 Miss 판정 처리
+                pickupScript.OnMissed();
+                // OnMissed에서 이미 Destroy를 호출하므로 여기서는 호출하지 않음
+                return;
+            }
+            
+            // 이미 처리된 노트는 그냥 파괴
             if (other.gameObject.GetComponent<FloatablePickupScript>() != null)
             {
-                Debug.Log(name + " : PickupItem trigger");
-                //GameModeManager.instance.m_PlayerHealth -= 30;
                 Destroy(other.gameObject);
             }
         }

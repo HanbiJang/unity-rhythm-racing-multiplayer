@@ -110,6 +110,12 @@ public class PacketData : TSData
                         fields[curFieldIdx].SetValue(this, Convert.ToInt64(obj));
                         size = sizeof(long);
                     }
+                    else if (f.FieldType.Equals(typeof(float)))
+                    {
+                        obj = BitConverter.ToSingle(ByteArr, current_pos);
+                        fields[curFieldIdx].SetValue(this, Convert.ToSingle(obj));
+                        size = sizeof(float);
+                    }
 
                     ++curFieldIdx;
                 }
@@ -485,20 +491,24 @@ public class SpawnNodeData : PacketData
 {
     int _NodeType;
     int _NodePos;
+    int _NodeTimeMs;  // 노트의 타이밍 (게임 시작 후 경과 시간, 밀리초)
 
     public int NodeType { get { return _NodeType; } set { _NodeType = value; } }
     public int NodePos { get { return _NodePos; } set { _NodePos = value; } }
+    public int NodeTimeMs { get { return _NodeTimeMs; } set { _NodeTimeMs = value; } }
 
     //생성자
     public SpawnNodeData()
     {
         _NodeType = 0;
         _NodePos = 0;
+        _NodeTimeMs = 0;
     }
-    public SpawnNodeData(int NodeType_, int NodePos_)
+    public SpawnNodeData(int NodeType_, int NodePos_, int NodeTimeMs_ = 0)
     {
         _NodeType = NodeType_;
         _NodePos = NodePos_;
+        _NodeTimeMs = NodeTimeMs_;
     }
 }
 

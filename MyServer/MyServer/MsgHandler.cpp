@@ -151,7 +151,7 @@ void HandleJudement(Message& msg)
 	if (room == nullptr)
 		return;
 
-	room->CalculateScore(pkt->userID, pkt->nodeType);
+	room->CalculateScore(pkt->userID, pkt->nodeType, pkt->judgmentType, pkt->timeDifference, pkt->score);
 }
 
 void HandleRetryGame(Message& msg)
