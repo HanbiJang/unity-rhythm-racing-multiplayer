@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Assets.Scripts
+public class ResultUIController : MonoBehaviour
 {
-    public class ResultUIController : MonoBehaviour
-    {
         [SerializeField] Transform rankingRoot; //  contents 
         [SerializeField] GameObject rankingItemPrefab; // 랭킹 점수 표시 프리팹 
 
@@ -74,6 +72,4 @@ namespace Assets.Scripts
         {
             ResultFlow.BackToLobby();
         }
-    }
-
 }

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [System.Serializable]
-public class NoteData : TSData
+public class NoteData
 {
     private int _Index;
     private float _Time;

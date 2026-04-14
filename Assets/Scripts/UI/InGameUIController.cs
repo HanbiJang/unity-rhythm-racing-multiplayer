@@ -20,8 +20,8 @@ public class InGameUIController : MonoBehaviour
     [SerializeField]
     Image m_HealthBarImageRight;
 
-    // PlayerFollower 참조 캐싱
-    private PlayerFollower playerFollower;
+    // PlayerController 참조 캐싱
+    private PlayerController playerFollower;
 
 
     // Start is called before the first frame update
@@ -50,10 +50,10 @@ public class InGameUIController : MonoBehaviour
         if (GameModeManager.instance == null)
             return;
 
-        // PlayerFollower 찾기 (처음 한 번만)
+        // PlayerController 찾기 (처음 한 번만)
         if (playerFollower == null)
         {
-            playerFollower = FindObjectOfType<PlayerFollower>();
+            playerFollower = FindObjectOfType<PlayerController>();
         }
 
         // 점수 업데이트
@@ -71,7 +71,7 @@ public class InGameUIController : MonoBehaviour
             }
             else
             {
-                // PlayerFollower를 찾지 못한 경우 시간 기준으로 폴백
+                // PlayerController를 찾지 못한 경우 시간 기준으로 폴백
                 if (GameModeManager.instance.g_SoundLength > 0)
                 {
                     m_ProgressBarFillImage.fillAmount = GameModeManager.instance.m_CurrentTime / GameModeManager.instance.g_SoundLength;

@@ -49,7 +49,7 @@ public static class ResultFlow
             s_isResultShown = true;
             
             // ResultUIController가 있으면 Refresh 호출
-            var resultController = panel.GetComponent<Assets.Scripts.ResultUIController>();
+            var resultController = panel.GetComponent<ResultUIController>();
             if (resultController != null)
             {
                 resultController.Refresh();

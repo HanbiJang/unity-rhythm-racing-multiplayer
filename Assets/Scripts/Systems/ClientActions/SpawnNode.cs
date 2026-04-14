@@ -1,7 +1,6 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using PathCreation.Examples;
 
 public class SpawnNode : MonoBehaviour, IClientAction
 {
@@ -52,25 +51,14 @@ public class SpawnNode : MonoBehaviour, IClientAction
         // 노트와 플레이어 사이의 거리 계산
         float gapDistance = spawnerFollower.GapBetweenPlayer;
 
-        // 노트의 이동 속도 - PathFollower를 찾지 못하면 SpwanerFollower의 속도를 사용
-        // (노트와 스포너는 같은 속도로 이동하므로)
+        // 노트 이동 속도는 SpwanerFollower.speed 기준
         float nodeSpeed = spawnerFollower.speed;
-        
-        // PathFollower가 있으면 그것을 우선 사용 (스폰 직후에는 없을 수 있으므로 폴백)
-        PathFollower nodeFollower = node.GetComponent<PathFollower>();
-        
-        // #region agent log
-        try {
-            string logEntry = $"{{\"sessionId\":\"debug-session\",\"runId\":\"run1\",\"hypothesisId\":\"H2\",\"location\":\"SpawnNode.cs:CalculateExpectedTime\",\"message\":\"PathFollower check\",\"data\":{{\"nodeFollowerFound\":{(nodeFollower != null).ToString().ToLower()},\"nodeFollowerSpeed\":{(nodeFollower != null ? nodeFollower.speed : 0)},\"spawnerSpeed\":{spawnerFollower.speed}}},\"timestamp\":{System.DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()}}}\n";
-            System.IO.File.AppendAllText(@"d:\GitRepo\Unity Racing Game\.cursor\debug.log", logEntry);
-        } catch {}
-        // #endregion
-        
-        if (nodeFollower != null && nodeFollower.speed > 0f)
-        {
-            nodeSpeed = nodeFollower.speed;
-        }
-        
+
+        // NoteMovement 컴포넌트가 있으면 그 속도를 우선 사용
+        NoteMovement noteMovement = node.GetComponent<NoteMovement>();
+        if (noteMovement != null && noteMovement.speed > 0f)
+            nodeSpeed = noteMovement.speed;
+
         if (nodeSpeed <= 0f)
         {
             Debug.LogWarning("[SpawnNode] Node speed is 0 or negative, using server note time");
@@ -107,12 +95,12 @@ public class SpawnNode : MonoBehaviour, IClientAction
     //서버에서 준 노드 데이터를 기반으로 노드를 스폰하는 코드
     public void Do(byte[] byteData)
     {
-        Debug.Log("SpawnNode()");
+        // Debug.Log("SpawnNode()");
 
         //데이터 저장
         SpawnNodeData data = new SpawnNodeData();
         data.ConvertToGameData(byteData);
-        Debug.Log("NodeType " + data.NodeType + "NodePos " + data.NodePos);
+        // Debug.Log("NodeType " + data.NodeType + "NodePos " + data.NodePos);
         
         // #region agent log
         try {
@@ -130,22 +118,7 @@ public class SpawnNode : MonoBehaviour, IClientAction
 
         //위 data 활용
         // 씬 전환 중일 수 있으므로 여러 번 시도
-        NodeSpwaner ns = null;
-        GameObject editorOnlyObj = GameObject.FindWithTag("EditorOnly");
-        if (editorOnlyObj != null)
-        {
-            ProxyScript proxyScript = editorOnlyObj.GetComponent<ProxyScript>();
-            if (proxyScript != null && proxyScript.proxy != null)
-            {
-                ns = proxyScript.proxy.GetComponent<NodeSpwaner>();
-            }
-        }
-
-        // 빌드에서는 EditorOnly 오브젝트가 제거될 수 있으므로 직접 탐색
-        if (ns == null)
-        {
-            ns = FindObjectOfType<NodeSpwaner>();
-        }
+        NodeSpwaner ns = FindObjectOfType<NodeSpwaner>();
 
         if (ns == null)
         {
@@ -235,7 +208,7 @@ public class SpawnNode : MonoBehaviour, IClientAction
         if (GameModeManager.instance != null)
         {
             GameModeManager.instance.currentNoteIndex++;
-            Debug.Log($"Note Progress: {GameModeManager.instance.currentNoteIndex} / {GameModeManager.instance.totalNoteCount}");
+            // Debug.Log($"Note Progress: {GameModeManager.instance.currentNoteIndex} / {GameModeManager.instance.totalNoteCount}");
         }
     }
 }

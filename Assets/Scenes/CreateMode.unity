@@ -182,7 +182,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_FontData:
-    m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
+    m_Font: {fileID: 12800000, guid: cb4bf5eddcb92a24194468240c5d76ed, type: 3}
     m_FontSize: 50
     m_FontStyle: 0
     m_BestFit: 0
@@ -466,7 +466,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   songs:
-  - {fileID: 8300000, guid: 1e010626813d8c049a3738139cdf78b0, type: 3}
+  - {fileID: 8300000, guid: c312687cc4c5ca940b1c9c736a5d4d46, type: 3}
   audioSource: {fileID: 0}
   gridSeconds: 0.25
   leftKey: 97
@@ -475,12 +475,13 @@ MonoBehaviour:
   failCountMin: 0
   failCountMax: 30
   failNodeCount: 0
-  hitOffsetSeconds: -2.25
+  simulationGapDistance: 30
+  simulationNodeSpeed: 10
   outputRelativePath: MyServer/MyServer/MusicNodeData.xml
-  recordButton: {fileID: 0}
-  stopButton: {fileID: 0}
-  endButton: {fileID: 0}
-  failSlider: {fileID: 0}
+  recordButton: {fileID: 1233457754}
+  stopButton: {fileID: 1795842788}
+  endButton: {fileID: 1384308310}
+  failSlider: {fileID: 2136900890}
 --- !u!1 &881933923
 GameObject:
   m_ObjectHideFlags: 0
@@ -540,7 +541,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_FontData:
-    m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
+    m_Font: {fileID: 12800000, guid: cb4bf5eddcb92a24194468240c5d76ed, type: 3}
     m_FontSize: 90
     m_FontStyle: 0
     m_BestFit: 0
@@ -691,7 +692,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 2
-  m_BackGroundColor: {r: 0.2524475, g: 0.2738635, b: 0.2924528, a: 0}
+  m_BackGroundColor: {r: 0.19268246, g: 0.15806337, b: 0.3018868, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -843,8 +844,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
-  m_Type: 1
+  m_Sprite: {fileID: -2172732579253354971, guid: 4b70c7e91a4685643bd2d8d027359c08, type: 3}
+  m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
@@ -920,7 +921,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_FontData:
-    m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
+    m_Font: {fileID: 12800000, guid: cb4bf5eddcb92a24194468240c5d76ed, type: 3}
     m_FontSize: 50
     m_FontStyle: 0
     m_BestFit: 0
@@ -1045,8 +1046,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
-  m_Type: 1
+  m_Sprite: {fileID: -2172732579253354971, guid: 4b70c7e91a4685643bd2d8d027359c08, type: 3}
+  m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
@@ -1274,7 +1275,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_FontData:
-    m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
+    m_Font: {fileID: 12800000, guid: cb4bf5eddcb92a24194468240c5d76ed, type: 3}
     m_FontSize: 50
     m_FontStyle: 0
     m_BestFit: 0
@@ -1436,8 +1437,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
-  m_Type: 1
+  m_Sprite: {fileID: -2172732579253354971, guid: 4b70c7e91a4685643bd2d8d027359c08, type: 3}
+  m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
@@ -1513,7 +1514,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_FontData:
-    m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
+    m_Font: {fileID: 12800000, guid: cb4bf5eddcb92a24194468240c5d76ed, type: 3}
     m_FontSize: 79
     m_FontStyle: 0
     m_BestFit: 0

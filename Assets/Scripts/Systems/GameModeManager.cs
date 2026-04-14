@@ -34,7 +34,6 @@ public class GameModeManager : MonoBehaviour
     public void SetSpeed() { s_RoadMoveSpeed = m_RoadMoveSpeed; }
 
 
-    public ObjectSpawner m_ObjectSpawner;
 
     public float m_CurrentTime { get; private set; }
     bool m_useSyncedClock = false;
@@ -46,8 +45,7 @@ public class GameModeManager : MonoBehaviour
             return;
 
         bGameOver = true;
-        m_ObjectSpawner?.StopSpawning();
-        
+
         // 서버로 EndGame 패킷 전송
         if (ServerInterface.Instance != null && (GameState.IsTestMode || (ServerInterface.Instance.SocketConnection != null && ServerInterface.Instance.SocketConnection.Connected)))
         {
@@ -68,8 +66,6 @@ public class GameModeManager : MonoBehaviour
         m_CurrentTime = 0f;
         m_useSyncedClock = false;
 
-        // 스포너/런타임 오브젝트 정리
-        m_ObjectSpawner?.StopSpawning();
         // 필요시 풀링 매니저 리셋, DOTween.KillAll(), Addressables Release 등
 
         // UI 되돌리기
@@ -151,24 +147,12 @@ public class GameModeManager : MonoBehaviour
     void Update()
     {
         UpdateCurrentTime();
-        if (m_ObjectSpawner == null) return;
         if (bGameOver)
             return;
 
-        // 점수는 서버에서만 계산하고 ScoreBroadcast를 통해 받아옴
-        // m_PlayerScore는 ScoreBroadcast에서 서버 점수로 업데이트됨
-
-        if (m_ObjectSpawner.IsInvoking() && m_CurrentTime >= g_SoundLength - 7.7f)
-        {
-            //bGameOver = true;
-            m_ObjectSpawner.StopSpawning();
-        }
         if (m_CurrentTime >= g_SoundLength)
         {
-            if (!bGameOver)
-            {
-                SetGameOver();
-            }
+            SetGameOver();
         }
 
 

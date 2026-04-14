@@ -5,10 +5,6 @@ class ClientActionFactory : MonoBehaviour
     {
         switch (pachetID)
         {
-            case EPacketID.ReadyGame:
-                return new ReadyGame();
-            case EPacketID.Judgement:
-                return new Judgement();
             case EPacketID.RetryGame:
                 return new RetryGame();
             case EPacketID.EndGame:

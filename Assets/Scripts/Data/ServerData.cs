@@ -9,7 +9,7 @@ using UnityEngine;
 /// <summary>
 /// Server와 Client 간의 주고받는 데이터
 /// </summary>
-public class PacketData : TSData
+public class PacketData
 {
     //Deserialize
     public PacketData ConvertToGameData(byte[] ByteArr)
