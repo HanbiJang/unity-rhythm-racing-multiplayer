@@ -62,57 +62,55 @@ public class HitEffectManager : MonoBehaviour
         }
     }
 
+    // 판정 타입별 색상
+    static readonly Color ColorPerfect = new Color(1f, 0.85f, 0f);   // 골드
+    static readonly Color ColorGood    = new Color(0f, 1f, 0.4f);    // 초록
+    static readonly Color ColorBad     = new Color(0.3f, 0.5f, 1f);  // 파랑
+    static readonly Color ColorDefault = Color.white;
+
+    /// <summary>판정 타입에 맞는 색상으로 이펙트를 재생합니다.</summary>
+    public void PlayJudgmentEffect(Vector3 hitPosition, JudgmentSystem.JudgmentType type)
+    {
+        Color color = type switch
+        {
+            JudgmentSystem.JudgmentType.Perfect => ColorPerfect,
+            JudgmentSystem.JudgmentType.Good    => ColorGood,
+            JudgmentSystem.JudgmentType.Bad     => ColorBad,
+            _                                   => ColorDefault,
+        };
+        PlayHitPointEffect(hitPosition, color);
+    }
+
     /// <summary>
     /// 타격 지점 기반으로 카메라 시야에 보이는 위치에 이펙트를 재생합니다.
     /// </summary>
-    /// <param name="hitPosition">타격 지점 (월드 좌표)</param>
-    public void PlayHitPointEffect(Vector3 hitPosition)
+    public void PlayHitPointEffect(Vector3 hitPosition, Color tint = default)
     {
-        if (hitPointEffectPrefab == null)
-        {
-            Debug.LogWarning("[HitEffectManager] Hit point effect prefab is not assigned!");
-            return;
-        }
+        if (hitPointEffectPrefab == null || mainCamera == null) return;
 
-        if (mainCamera == null)
-        {
-            Debug.LogWarning("[HitEffectManager] Main camera not found! Cannot play hit effect.");
-            return;
-        }
+        if (tint == default) tint = ColorDefault;
 
         Vector3 effectPosition = GetVisiblePositionFromCamera(hitPosition);
-
-        // 이펙트 인스턴스 생성
         GameObject effectInstance = Instantiate(hitPointEffectPrefab, effectPosition, Quaternion.identity);
+
         if (hitEffectScale > 0f)
-        {
             effectInstance.transform.localScale *= hitEffectScale;
-        }
-        
-        // 이펙트가 자동으로 파괴되지 않으면 ParticleSystem을 확인해서 재생 시간 후 파괴
-        ParticleSystem[] particles = effectInstance.GetComponentsInChildren<ParticleSystem>();
-        if (particles.Length > 0)
+
+        // 파티클 색상 적용
+        foreach (var ps in effectInstance.GetComponentsInChildren<ParticleSystem>())
         {
-            float maxDuration = 0f;
-            foreach (var particle in particles)
-            {
-                float duration = particle.main.duration + particle.main.startLifetime.constantMax;
-                if (duration > maxDuration)
-                    maxDuration = duration;
-            }
-            
-            if (maxDuration > 0f)
-            {
-                Destroy(effectInstance, maxDuration);
-            }
-        }
-        else
-        {
-            // ParticleSystem이 없으면 기본 시간 후 파괴
-            Destroy(effectInstance, 2f);
+            var main = ps.main;
+            main.startColor = tint;
         }
 
-        Debug.Log($"[HitEffectManager] Played hit point effect at {effectPosition}");
+        // 재생 시간 후 파괴
+        float maxDuration = 2f;
+        foreach (var ps in effectInstance.GetComponentsInChildren<ParticleSystem>())
+        {
+            float d = ps.main.duration + ps.main.startLifetime.constantMax;
+            if (d > maxDuration) maxDuration = d;
+        }
+        Destroy(effectInstance, maxDuration);
     }
 
     /// <summary>
@@ -133,10 +131,6 @@ public class HitEffectManager : MonoBehaviour
         return cameraPosition + direction * depth;
     }
 
-    /// <summary>
-    /// 타격 지점과 화면 테두리 이펙트를 모두 재생합니다.
-    /// </summary>
-    /// <param name="hitPosition">타격 지점 (월드 좌표)</param>
     public void PlayAllEffects(Vector3 hitPosition)
     {
         PlayHitPointEffect(hitPosition);

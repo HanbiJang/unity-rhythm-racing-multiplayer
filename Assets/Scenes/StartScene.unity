@@ -831,7 +831,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1808d65237251d54abd7ff8bf6a5e50a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  g_RoadMoveSpeed: 0
+  g_RoadMoveSpeed: 30
   g_SoundLength: 62
   totalNoteCount: 0
   currentNoteIndex: 0

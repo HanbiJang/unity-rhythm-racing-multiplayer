@@ -4,34 +4,80 @@ using UnityEngine;
 
 public class PlayerCameraController : MonoBehaviour
 {
+    public static PlayerCameraController Instance { get; private set; }
+
     [SerializeField, Header("플레이어 Transform (자동으로 찾을 수도 있음)")]
     Transform m_PlayerTransform;
-    
+
     [SerializeField, Header("카메라와 플레이어 사이의 거리 (뒤편)")]
     float m_FollowDistance = 10f;
-    
+
     [SerializeField, Header("카메라 높이 오프셋")]
     float m_HeightOffset = 5f;
-    
+
     [SerializeField, Header("플레이어를 바라보는 속도 (값이 클수록 빠르게 플레이어를 바라봄)")]
     [Range(0.1f, 10f)]
     float m_LookSpeed = 2f;
-    
+
     [SerializeField, Header("카메라 이동 속도 (값이 클수록 빠르게 따라옴)")]
     [Range(0.1f, 10f)]
     float m_FollowSpeed = 5f;
-    
+
     [SerializeField, Header("Player 태그 이름 (기본값: Player)")]
     string m_PlayerTag = "Player";
-    
+
     [SerializeField, Header("플레이어 찾기 재시도 간격 (초)")]
     float m_FindPlayerRetryInterval = 1f;
-    
+
+    [Header("카메라 셰이크")]
+    [SerializeField] float m_ShakeDecay = 8f;
+
+    [Header("콤보 FOV 효과")]
+    [SerializeField] float m_BaseFOV = 60f;
+    [SerializeField] float m_MaxFOVBonus = 15f;
+    [SerializeField] int m_MaxComboForFOV = 50;
+    [SerializeField] float m_FOVSmoothSpeed = 3f;
+
     bool m_PlayerFound = false;
+    Camera m_Camera;
+    float m_TargetFOV;
+
+    // 셰이크 상태
+    float m_ShakeIntensity;
+    Vector3 m_ShakeOffset;
+
+    void Awake()
+    {
+        Instance = this;
+    }
 
     void Start()
     {
+        m_Camera = GetComponentInChildren<Camera>();
+        if (m_Camera == null) m_Camera = Camera.main;
+        if (m_Camera != null)
+        {
+            m_BaseFOV = m_Camera.fieldOfView;
+            m_TargetFOV = m_BaseFOV;
+        }
+
+        if (ComboTracker.Instance != null)
+            ComboTracker.Instance.OnComboChanged += OnComboChanged;
+
         FindPlayer();
+    }
+
+    // 판정 강도에 따라 셰이크 시작 (외부에서 호출)
+    public static void Shake(float intensity)
+    {
+        if (Instance != null)
+            Instance.m_ShakeIntensity = intensity;
+    }
+
+    void OnComboChanged(int combo)
+    {
+        float t = Mathf.Clamp01((float)combo / m_MaxComboForFOV);
+        m_TargetFOV = m_BaseFOV + m_MaxFOVBonus * t;
     }
     
     void FindPlayer()
@@ -78,11 +124,26 @@ public class PlayerCameraController : MonoBehaviour
 
     void LateUpdate()
     {
-        // 플레이어를 찾지 못했다면 업데이트하지 않음
         if (!m_PlayerFound || m_PlayerTransform == null)
             return;
 
         UpdateCameraPosition(m_FollowSpeed * Time.deltaTime);
+
+        // 셰이크
+        if (m_ShakeIntensity > 0.001f)
+        {
+            m_ShakeOffset = Random.insideUnitSphere * m_ShakeIntensity;
+            transform.position += m_ShakeOffset;
+            m_ShakeIntensity = Mathf.Lerp(m_ShakeIntensity, 0f, Time.deltaTime * m_ShakeDecay);
+        }
+        else
+        {
+            m_ShakeIntensity = 0f;
+        }
+
+        // 콤보 FOV
+        if (m_Camera != null)
+            m_Camera.fieldOfView = Mathf.Lerp(m_Camera.fieldOfView, m_TargetFOV, Time.deltaTime * m_FOVSmoothSpeed);
     }
     
     void UpdateCameraPosition(float lerpSpeed)

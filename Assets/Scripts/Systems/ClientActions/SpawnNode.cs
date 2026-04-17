@@ -54,10 +54,9 @@ public class SpawnNode : MonoBehaviour, IClientAction
         // 노트 이동 속도는 SpwanerFollower.speed 기준
         float nodeSpeed = spawnerFollower.speed;
 
-        // NoteMovement 컴포넌트가 있으면 그 속도를 우선 사용
-        NoteMovement noteMovement = node.GetComponent<NoteMovement>();
-        if (noteMovement != null && noteMovement.speed > 0f)
-            nodeSpeed = noteMovement.speed;
+        // 속도는 GameModeManager에서 일괄 관리
+        if (GameModeManager.instance != null && GameModeManager.instance.m_RoadMoveSpeed > 0f)
+            nodeSpeed = GameModeManager.instance.m_RoadMoveSpeed;
 
         if (nodeSpeed <= 0f)
         {

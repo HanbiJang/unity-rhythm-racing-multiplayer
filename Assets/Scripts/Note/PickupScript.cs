@@ -78,10 +78,28 @@ public class PickupScript : MonoBehaviour
             Debug.LogWarning("[PickupScript] Cannot perform judgment - missing expected time or JudgmentSystem");
         }
 
+        // 판정 기반 카메라 셰이크
+        if (judgmentResult != null)
+        {
+            float shakeIntensity = judgmentResult.type switch
+            {
+                JudgmentSystem.JudgmentType.Perfect => 0.2f,
+                JudgmentSystem.JudgmentType.Good    => 0.1f,
+                JudgmentSystem.JudgmentType.Bad     => 0.05f,
+                _                                   => 0f,
+            };
+            if (shakeIntensity > 0f)
+                PlayerCameraController.Shake(shakeIntensity);
+        }
+
+        // 판정 기반 파티클 색상
         if (HitEffectManager.Instance != null)
         {
             Vector3 hitPoint = (transform.position + crusherPosition) * 0.5f;
-            HitEffectManager.Instance.PlayAllEffects(hitPoint);
+            if (judgmentResult != null)
+                HitEffectManager.Instance.PlayJudgmentEffect(hitPoint, judgmentResult.type);
+            else
+                HitEffectManager.Instance.PlayAllEffects(hitPoint);
         }
 
         if (nodeType >= 3)
