@@ -1,4 +1,6 @@
 #pragma once
+#include <queue>
+#include <vector>
 #include <boost/asio.hpp>
 #include "NetBuffer.h"
 #include "Message.h"
@@ -13,8 +15,8 @@ public:
 		: m_socket(std::move(socket))
 		, m_roomID(0)
 		, m_userID(userID)
+		, m_isWriting(false)
 	{}
-
 
 	uint64_t UserID();
 	void Start();
@@ -24,19 +26,18 @@ public:
 protected:
 	void OnAsyncRead(boost::system::error_code ec, std::size_t length);
 	void DoRead();
-	
+
 	void OnAsyncWrite(boost::system::error_code ec, std::size_t length);
 	void DoWrite();
 
 private:
 	std::shared_ptr<tcp::socket> m_socket;
 	NetBuffer m_readBuffer;
-	NetBuffer m_writeBuffer;
-
 	Message m_readMsg;
 
-	// concerned about making User Class
-	// seperate to Contents and frameworks
+	std::queue<std::vector<char>> m_sendQueue;
+	bool m_isWriting;
+
 	uint64_t m_userID;
 	uint64_t m_roomID;
 };

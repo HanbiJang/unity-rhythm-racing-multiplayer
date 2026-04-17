@@ -18,9 +18,20 @@ void Session::Start()
 
 void Session::Deliver(Message& msg)
 {
-	m_writeBuffer.Write(reinterpret_cast<char*>(&msg.Header()), sizeof(Message::PacketHeader));
-	m_writeBuffer.Write(msg.Data(), msg.Header().bodyLength);
-	DoWrite();
+	size_t headerSize = sizeof(Message::PacketHeader);
+	size_t bodySize = msg.Header().bodyLength;
+
+	std::vector<char> data(headerSize + bodySize);
+	std::memcpy(data.data(), &msg.Header(), headerSize);
+	std::memcpy(data.data() + headerSize, msg.Data(), bodySize);
+
+	m_sendQueue.push(std::move(data));
+
+	if (!m_isWriting)
+	{
+		m_isWriting = true;
+		DoWrite();
+	}
 }
 
 void Session::SetRoomInfo(uint64_t roomID)
@@ -72,11 +83,20 @@ void Session::OnAsyncWrite(boost::system::error_code ec, std::size_t length)
 {
 	if (!ec)
 	{
-		m_writeBuffer.Clear();
+		m_sendQueue.pop();
+		if (!m_sendQueue.empty())
+		{
+			DoWrite();
+		}
+		else
+		{
+			m_isWriting = false;
+		}
 	}
 	else
 	{
 		std::cout << "Write Fail [Error]" << ec << "\n";
+		m_isWriting = false;
 		RoomPtr room = RoomManager::Instance()->FindRoom(m_roomID);
 		room->Leave(m_userID);
 
@@ -87,6 +107,7 @@ void Session::OnAsyncWrite(boost::system::error_code ec, std::size_t length)
 
 void Session::DoWrite()
 {
-	boost::asio::async_write(*m_socket, boost::asio::buffer(m_writeBuffer.Data(), m_writeBuffer.UsingSize()),
+	auto& data = m_sendQueue.front();
+	boost::asio::async_write(*m_socket, boost::asio::buffer(data.data(), data.size()),
 		std::bind(&Session::OnAsyncWrite, shared_from_this(), std::placeholders::_1, std::placeholders::_2));
 }

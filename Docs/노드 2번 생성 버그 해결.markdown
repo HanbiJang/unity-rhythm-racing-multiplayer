@@ -1,0 +1,150 @@
+Session 중복 패킷 전송 버그 수정 기술문서
+개요
+Unity 레이싱 게임 서버에서 클라이언트가 동일한 SpawnNode 패킷을 2번씩 수신하는 버그를 수정했다.
+
+증상
+클라이언트 Console 로그에서 동일한 NodeTimeMs, NodeType, NodePos를 가진 SpawnNode가 매번 2회 출력됨.
+
+[SpawnNode] Node spawned with expected time: 3.000s, NodeType: 0, NodePos: 1, NodeTimeMs: 0
+[SpawnNode] Node spawned with expected time: 3.000s, NodeType: 0, NodePos: 1, NodeTimeMs: 0  ← 중복
+[SpawnNode] Node spawned with expected time: 3.008s, NodeType: 1, NodePos: 0, NodeTimeMs: 8
+[SpawnNode] Node spawned with expected time: 3.008s, NodeType: 1, NodePos: 0, NodeTimeMs: 8  ← 중복
+콜 스택이 동일하고 ServerInterface:Update()에서 출발하므로 서버에서 중복 전송 중임을 확인.
+
+원인 분석
+서버 Update() 흐름
+RoomManager::DoLogic()은 매 프레임 Room::Update()를 호출한다.
+
+Room::Update()
+  └─ SpawnNode()       → Room::Deliver()  → m_msgQueue에 SpawnNode 적재
+  └─ MakeScoreList()   → Room::Deliver()  → m_msgQueue에 ScoreBroadcast 적재
+  └─ Broadcast()       → m_msgQueue를 순회하며 Session::Deliver() 호출
+Broadcast()의 동작
+void Room::Broadcast()
+{
+    while (!m_msgQueue.empty())
+    {
+        Message& msg = m_msgQueue.front();
+        m_msgQueue.pop();
+        for (auto user : m_sessions)
+        {
+            user.second->Deliver(msg);  // 같은 세션에 여러 번 호출됨
+        }
+    }
+}
+한 프레임에 메시지가 2개(SpawnNode, ScoreBroadcast)이면 Session::Deliver()가 같은 세션에 대해 2번 호출된다.
+
+기존 Session::Deliver()의 문제
+// 수정 전
+void Session::Deliver(Message& msg)
+{
+    m_writeBuffer.Write(...header...);
+    m_writeBuffer.Write(...body...);
+    DoWrite();  // ← 호출될 때마다 async_write 시작
+}
+
+void Session::DoWrite()
+{
+    // 현재 버퍼의 전체 내용을 전송
+    boost::asio::async_write(*m_socket,
+        boost::asio::buffer(m_writeBuffer.Data(), m_writeBuffer.UsingSize()), ...);
+}
+Deliver()를 연속 호출하면 아래와 같이 동작한다.
+
+호출 순서	버퍼 상태	async_write 전송 범위
+1번째 Deliver(SpawnNode)	[SpawnNode]	SpawnNode 전체 전송
+2번째 Deliver(ScoreBroadcast)	[SpawnNode + ScoreBroadcast]	SpawnNode + ScoreBroadcast 전체 전송
+결과적으로 클라이언트는 다음을 수신한다.
+
+async_write #1 → SpawnNode
+async_write #2 → SpawnNode + ScoreBroadcast
+SpawnNode가 2번 수신되는 이유가 여기에 있다.
+
+이는 Boost.Asio의 규칙 위반이기도 하다. 동일 소켓에 async_write가 완료되기 전에 새 async_write를 시작하면 안 된다.
+
+수정 내용
+핵심 아이디어
+m_writeBuffer 단일 버퍼 방식을 전송 큐(send queue) 방식으로 교체한다.
+
+Deliver()는 메시지를 큐에 적재만 한다.
+async_write는 큐에 항목이 있을 때 하나씩 순서대로 실행한다.
+OnAsyncWrite 완료 후 큐에 다음 항목이 있으면 이어서 전송한다.
+Session.h 변경
+// 수정 전
+NetBuffer m_writeBuffer;
+
+// 수정 후
+#include <queue>
+#include <vector>
+
+std::queue<std::vector<char>> m_sendQueue;
+bool m_isWriting;
+Session.cpp 변경
+// 수정 전
+void Session::Deliver(Message& msg)
+{
+    m_writeBuffer.Write(reinterpret_cast<char*>(&msg.Header()), sizeof(Message::PacketHeader));
+    m_writeBuffer.Write(msg.Data(), msg.Header().bodyLength);
+    DoWrite();
+}
+
+void Session::DoWrite()
+{
+    boost::asio::async_write(*m_socket,
+        boost::asio::buffer(m_writeBuffer.Data(), m_writeBuffer.UsingSize()), ...);
+}
+
+void Session::OnAsyncWrite(boost::system::error_code ec, std::size_t length)
+{
+    if (!ec)
+        m_writeBuffer.Clear();
+}
+// 수정 후
+void Session::Deliver(Message& msg)
+{
+    size_t headerSize = sizeof(Message::PacketHeader);
+    size_t bodySize = msg.Header().bodyLength;
+
+    std::vector<char> data(headerSize + bodySize);
+    std::memcpy(data.data(), &msg.Header(), headerSize);
+    std::memcpy(data.data() + headerSize, msg.Data(), bodySize);
+
+    m_sendQueue.push(std::move(data));
+
+    if (!m_isWriting)
+    {
+        m_isWriting = true;
+        DoWrite();
+    }
+}
+
+void Session::DoWrite()
+{
+    auto& data = m_sendQueue.front();
+    boost::asio::async_write(*m_socket,
+        boost::asio::buffer(data.data(), data.size()), ...);
+}
+
+void Session::OnAsyncWrite(boost::system::error_code ec, std::size_t length)
+{
+    if (!ec)
+    {
+        m_sendQueue.pop();
+        if (!m_sendQueue.empty())
+            DoWrite();       // 다음 메시지 전송
+        else
+            m_isWriting = false;
+    }
+}
+수정 후 동작
+호출 순서	큐 상태	async_write
+Deliver(SpawnNode)	[SpawnNode]	시작 (SpawnNode만)
+Deliver(ScoreBroadcast)	[SpawnNode, ScoreBroadcast]	시작 안 함 (m_isWriting=true)
+async_write #1 완료	[ScoreBroadcast]	다음 시작 (ScoreBroadcast만)
+async_write #2 완료	[]	종료 (m_isWriting=false)
+수정 파일 목록
+파일	변경 내용
+MyServer/MyServer/Session.h	m_writeBuffer 제거, m_sendQueue / m_isWriting 추가
+MyServer/MyServer/Session.cpp	Deliver(), DoWrite(), OnAsyncWrite() 로직 교체
+교훈
+Boost.Asio에서 async_write를 사용할 때는 반드시 이전 write 완료 후 다음 write를 시작해야 한다. 완료 전에 새 async_write를 시작하면 버퍼 내용이 중복 전송되거나 데이터 레이스가 발생한다. 이를 방지하는 표준 패턴이 send queue + isWriting 플래그 조합이다.
