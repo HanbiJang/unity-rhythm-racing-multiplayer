@@ -80,6 +80,7 @@ public class ComboTracker : MonoBehaviour
     /// </summary>
     public void UpdateCombo(JudgmentSystem.JudgmentType judgmentType)
     {
+        Debug.Log($"[ComboTracker] UpdateCombo({judgmentType}) 호출 — 현재 콤보: {currentCombo}\n{System.Environment.StackTrace}");
         switch (judgmentType)
         {
             case JudgmentSystem.JudgmentType.Perfect:

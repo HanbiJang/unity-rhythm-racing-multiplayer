@@ -79,11 +79,11 @@ public class PlayerController : MonoBehaviour
     // ── 충돌 ─────────────────────────────────────
     void OnTriggerEnter(Collider other)
     {
-        Debug.Log($"[PlayerController] OnTriggerEnter — tag={other.tag}, obj={other.name}, isMissZone={m_IsMissZone}");
+        //Debug.Log($"[PlayerController] OnTriggerEnter — tag={other.tag}, obj={other.name}, isMissZone={m_IsMissZone}");
 
         if (!other.CompareTag("PickupItem"))
         {
-            Debug.Log($"[PlayerController] 태그 불일치로 무시 (tag={other.tag})");
+            // Debug.Log($"[PlayerController] 태그 불일치로 무시 (tag={other.tag})");
             return;
         }
 

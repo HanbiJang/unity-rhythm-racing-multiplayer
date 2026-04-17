@@ -46,6 +46,17 @@ public enum EPacketID
 /// </summary>
 public class ServerInterface : MonoBehaviour
 {
+    void Awake()
+    {
+        if (instance != null && instance != this)
+        {
+            Debug.LogWarning($"[ServerInterface] 중복 인스턴스 감지, 파괴: {gameObject.name}");
+            Destroy(gameObject);
+            return;
+        }
+        instance = this;
+        DontDestroyOnLoad(gameObject);
+    }
 
     List<KeyValuePair<int, byte[]>> actionbytes = new List<KeyValuePair<int, byte[]>>();
 

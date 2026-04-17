@@ -127,14 +127,14 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    IEnumerator testCo()
-    {
-        yield return new WaitForSeconds(3f);
-        ServerInterface.Instance.ClientAction((int)EPacketID.JoinGame, ServerInterface.Instance.SocketConnection, new byte[16]);
+    //IEnumerator testCo()
+    //{
+        //yield return new WaitForSeconds(3f);
+        //ServerInterface.Instance.ClientAction((int)EPacketID.JoinGame, ServerInterface.Instance.SocketConnection, new byte[16]);
 
-        yield return new WaitForSeconds(3f);
-        ServerInterface.Instance.ClientAction((int)EPacketID.StartGame, ServerInterface.Instance.SocketConnection, new byte[16]);
-    }
+        //yield return new WaitForSeconds(3f);
+        //ServerInterface.Instance.ClientAction((int)EPacketID.StartGame, ServerInterface.Instance.SocketConnection, new byte[16]);
+    //}
 
 
     //로딩 UI를 보여줌

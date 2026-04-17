@@ -81,7 +81,8 @@ public class GameModeManager : MonoBehaviour
     public void GameStart()
     {
         m_CurrentTime = 0f;
-        currentNoteIndex = 0;  // 게임 시작 시 초기화
+        currentNoteIndex = 0;
+        SpawnNode.ClearProcessedNodes();
 
         //if(LoadingRoad() == DONE)
 

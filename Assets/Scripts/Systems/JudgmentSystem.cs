@@ -30,13 +30,13 @@ public class JudgmentSystem : MonoBehaviour
 
     [Header("판정 윈도우 설정 (초 단위)")]
     [SerializeField]
-    private float perfectWindow = 0.4f;  // Perfect 판정 범위 (±0.4초)
+    private float perfectWindow = 0.08f; // Perfect 판정 범위 (±0.08초)
 
     [SerializeField]
-    private float goodWindow = 0.6f;     // Good 판정 범위 (±0.6초)
+    private float goodWindow = 0.15f;    // Good 판정 범위 (±0.15초)
 
     [SerializeField]
-    private float badWindow = 0.4f;      // Bad 판정 범위 (±0.4초)
+    private float badWindow = 0.25f;     // Bad 판정 범위 (±0.25초) — 반드시 goodWindow보다 커야 함
     
     [Header("입력 지연 보정 (초 단위)")]
     [SerializeField]

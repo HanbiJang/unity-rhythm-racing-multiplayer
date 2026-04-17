@@ -17,12 +17,15 @@ public class PickupScript : MonoBehaviour
 
     void Awake()
     {
-        // 노트 콜라이더는 반드시 트리거여야 OnTriggerEnter가 동작함
-        var col = GetComponent<Collider>();
-        if (col != null && !col.isTrigger)
+        // 모든 콜라이더를 트리거로 설정 (GetComponent는 첫 번째만 반환하므로 GetComponents 사용)
+        var cols = GetComponents<Collider>();
+        foreach (var col in cols)
         {
-            col.isTrigger = true;
-            Debug.Log($"[PickupScript] {gameObject.name} — Collider를 트리거로 자동 변경");
+            if (!col.isTrigger)
+            {
+                col.isTrigger = true;
+                Debug.Log($"[PickupScript] {gameObject.name} — {col.GetType().Name} 트리거로 변경");
+            }
         }
     }
 

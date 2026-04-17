@@ -7,6 +7,8 @@ using UnityEngine;
 /// </summary>
 public class NodeSpwaner : MonoBehaviour
 {
+    public static NodeSpwaner Instance { get; private set; }
+
     [SerializeField]
     List<GameObject> m_NodeList = new List<GameObject>();
 
@@ -15,6 +17,17 @@ public class NodeSpwaner : MonoBehaviour
 
     public int NodeListCount  => m_NodeList != null ? m_NodeList.Count : 0;
     public bool IsNodeListNull => m_NodeList == null;
+
+    void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Debug.LogWarning($"[NodeSpwaner] 중복 인스턴스 감지, 파괴: {gameObject.name}");
+            Destroy(gameObject);
+            return;
+        }
+        Instance = this;
+    }
 
     void Start()
     {
@@ -26,13 +39,15 @@ public class NodeSpwaner : MonoBehaviour
         if (spawnOrigin == null)
             FindSpawnOrigin();
 
-        // 디버그 키 (에디터 테스트용)
+#if UNITY_EDITOR
+        // 디버그 키 (에디터 테스트 전용)
         if (Input.GetKeyDown(KeyCode.K)) SpawnNodeCentre();
         if (Input.GetKeyDown(KeyCode.J)) SpawnNodeLeft();
         if (Input.GetKeyDown(KeyCode.L)) SpawnNodeRight();
         if (Input.GetKeyDown(KeyCode.B)) SpawnNodeCentre(1);
         if (Input.GetKeyDown(KeyCode.N)) SpawnNodeLeft(1);
         if (Input.GetKeyDown(KeyCode.M)) SpawnNodeRight(1);
+#endif
     }
 
     private void FindSpawnOrigin()

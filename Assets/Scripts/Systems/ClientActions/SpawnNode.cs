@@ -92,14 +92,25 @@ public class SpawnNode : MonoBehaviour, IClientAction
 
         return expectedTime;
     }
+    // 중복 패킷 필터링용 (NodeTimeMs 기준)
+    private static readonly System.Collections.Generic.HashSet<int> s_ProcessedNodeTimes
+        = new System.Collections.Generic.HashSet<int>();
+
+    public static void ClearProcessedNodes() => s_ProcessedNodeTimes.Clear();
+
     //서버에서 준 노드 데이터를 기반으로 노드를 스폰하는 코드
     public void Do(byte[] byteData)
     {
-        // Debug.Log("SpawnNode()");
-
         //데이터 저장
         SpawnNodeData data = new SpawnNodeData();
         data.ConvertToGameData(byteData);
+
+        // 동일 NodeTimeMs 패킷 중복 차단
+        if (!s_ProcessedNodeTimes.Add(data.NodeTimeMs))
+        {
+            Debug.LogWarning($"[SpawnNode] 중복 패킷 무시 — NodeTimeMs={data.NodeTimeMs}");
+            return;
+        }
         // Debug.Log("NodeType " + data.NodeType + "NodePos " + data.NodePos);
         
         // #region agent log
