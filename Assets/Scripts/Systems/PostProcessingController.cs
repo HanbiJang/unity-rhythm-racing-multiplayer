@@ -18,8 +18,8 @@ public class PostProcessingController : MonoBehaviour
     [SerializeField] int m_MaxCombo = 50;
 
     [Header("Bloom")]
-    [SerializeField] float m_BloomMin = 1f;
-    [SerializeField] float m_BloomMax = 6f;
+    [SerializeField] float m_BloomMin = 5f;
+    [SerializeField] float m_BloomMax = 15f;
 
     [Header("Motion Blur")]
     [SerializeField] float m_BlurMin = 0f;

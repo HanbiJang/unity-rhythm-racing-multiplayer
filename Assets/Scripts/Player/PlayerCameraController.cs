@@ -15,10 +15,6 @@ public class PlayerCameraController : MonoBehaviour
     [SerializeField, Header("카메라 높이 오프셋")]
     float m_HeightOffset = 5f;
 
-    [SerializeField, Header("플레이어를 바라보는 속도 (값이 클수록 빠르게 플레이어를 바라봄)")]
-    [Range(0.1f, 10f)]
-    float m_LookSpeed = 2f;
-
     [SerializeField, Header("카메라 이동 속도 (값이 클수록 빠르게 따라옴)")]
     [Range(0.1f, 10f)]
     float m_FollowSpeed = 5f;
@@ -28,6 +24,10 @@ public class PlayerCameraController : MonoBehaviour
 
     [SerializeField, Header("플레이어 찾기 재시도 간격 (초)")]
     float m_FindPlayerRetryInterval = 1f;
+
+    [Header("데드존 (이 범위 안에서는 카메라가 움직이지 않음)")]
+    [SerializeField] float m_DeadZoneX = 1.5f;  // 좌우 허용 범위
+    [SerializeField] float m_DeadZoneY = 1f;     // 상하 허용 범위
 
     [Header("카메라 셰이크")]
     [SerializeField] float m_ShakeDecay = 8f;
@@ -42,9 +42,10 @@ public class PlayerCameraController : MonoBehaviour
     Camera m_Camera;
     float m_TargetFOV;
 
-    // 셰이크 상태
+    // 카메라가 바라보는 월드 기준점 (데드존 중심)
+    Vector3 m_AnchorPosition;
+
     float m_ShakeIntensity;
-    Vector3 m_ShakeOffset;
 
     void Awake()
     {
@@ -67,7 +68,6 @@ public class PlayerCameraController : MonoBehaviour
         FindPlayer();
     }
 
-    // 판정 강도에 따라 셰이크 시작 (외부에서 호출)
     public static void Shake(float intensity)
     {
         if (Instance != null)
@@ -79,61 +79,50 @@ public class PlayerCameraController : MonoBehaviour
         float t = Mathf.Clamp01((float)combo / m_MaxComboForFOV);
         m_TargetFOV = m_BaseFOV + m_MaxFOVBonus * t;
     }
-    
+
     void FindPlayer()
     {
-        // 플레이어 Transform을 찾지 못했다면 자동으로 찾기
         if (m_PlayerTransform == null)
         {
-            // Player 태그로 찾기
             GameObject playerObj = GameObject.FindGameObjectWithTag(m_PlayerTag);
             if (playerObj != null)
             {
                 m_PlayerTransform = playerObj.transform;
                 m_PlayerFound = true;
-                Debug.Log($"PlayerCameraController: 플레이어를 찾았습니다. 위치: {m_PlayerTransform.position}");
             }
             else
             {
-                Debug.LogWarning($"PlayerCameraController: 플레이어를 찾을 수 없습니다. {m_FindPlayerRetryInterval}초 후 다시 시도합니다.");
                 m_PlayerFound = false;
                 StartCoroutine(RetryFindPlayer());
+                return;
             }
         }
         else
         {
             m_PlayerFound = true;
-            Debug.Log($"PlayerCameraController: Inspector에서 설정된 플레이어를 사용합니다. 위치: {m_PlayerTransform.position}");
         }
-        
-        // 플레이어를 찾았다면 초기 위치 설정
-        if (m_PlayerFound && m_PlayerTransform != null)
-        {
-            UpdateCameraPosition(1f); // 즉시 위치 설정
-        }
+
+        // 초기 앵커를 플레이어 위치로 설정
+        m_AnchorPosition = m_PlayerTransform.position;
+        UpdateCameraPosition();
     }
-    
+
     IEnumerator RetryFindPlayer()
     {
         yield return new WaitForSeconds(m_FindPlayerRetryInterval);
-        if (m_PlayerTransform == null)
-        {
-            FindPlayer();
-        }
+        if (m_PlayerTransform == null) FindPlayer();
     }
 
     void LateUpdate()
     {
-        if (!m_PlayerFound || m_PlayerTransform == null)
-            return;
+        if (!m_PlayerFound || m_PlayerTransform == null) return;
 
-        UpdateCameraPosition(m_FollowSpeed * Time.deltaTime);
+        UpdateCameraWithDeadZone();
 
         // 셰이크
         if (m_ShakeIntensity > 0.001f)
         {
-            m_ShakeOffset = Random.insideUnitSphere * m_ShakeIntensity;
-            transform.position += m_ShakeOffset;
+            transform.position += Random.insideUnitSphere * m_ShakeIntensity;
             m_ShakeIntensity = Mathf.Lerp(m_ShakeIntensity, 0f, Time.deltaTime * m_ShakeDecay);
         }
         else
@@ -145,42 +134,41 @@ public class PlayerCameraController : MonoBehaviour
         if (m_Camera != null)
             m_Camera.fieldOfView = Mathf.Lerp(m_Camera.fieldOfView, m_TargetFOV, Time.deltaTime * m_FOVSmoothSpeed);
     }
-    
-    void UpdateCameraPosition(float lerpSpeed)
+
+    void UpdateCameraWithDeadZone()
     {
-        // 플레이어의 뒤편 위치 계산
-        Vector3 playerPosition = m_PlayerTransform.position;
-        Vector3 playerForward = m_PlayerTransform.forward;
-        
-        // 플레이어의 뒤편 위치 (플레이어의 forward 방향의 반대)
-        Vector3 targetPosition = playerPosition - playerForward * m_FollowDistance;
-        targetPosition.y = playerPosition.y + m_HeightOffset; // 높이 오프셋 적용
+        Vector3 playerPos = m_PlayerTransform.position;
 
-        // 부드럽게 카메라 위치 이동
-        // lerpSpeed가 1.0 이상이면 즉시 이동, 그 외에는 Lerp 사용
-        if (lerpSpeed >= 1f)
-        {
-            transform.position = targetPosition;
-        }
-        else
-        {
-            // Lerp의 세 번째 인자는 0~1 사이여야 하므로 Time.deltaTime * m_FollowSpeed를 그대로 사용
-            transform.position = Vector3.Lerp(transform.position, targetPosition, m_FollowSpeed * Time.deltaTime);
-        }
+        // 플레이어가 앵커 기준 데드존을 벗어났을 때만 앵커 이동
+        float dx = playerPos.x - m_AnchorPosition.x;
+        float dy = playerPos.y - m_AnchorPosition.y;
 
-        // 플레이어를 바라보기
-        Vector3 lookDirection = playerPosition - transform.position;
-        if (lookDirection.sqrMagnitude > 0.001f) // 거의 0이 아닌 경우에만
-        {
-            Quaternion targetRotation = Quaternion.LookRotation(lookDirection);
-            if (lerpSpeed >= 1f)
-            {
-                transform.rotation = targetRotation;
-            }
-            else
-            {
-                transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, m_LookSpeed * Time.deltaTime);
-            }
-        }
+        if (Mathf.Abs(dx) > m_DeadZoneX)
+            m_AnchorPosition.x += dx - Mathf.Sign(dx) * m_DeadZoneX;
+
+        if (Mathf.Abs(dy) > m_DeadZoneY)
+            m_AnchorPosition.y += dy - Mathf.Sign(dy) * m_DeadZoneY;
+
+        // Z는 항상 따라감
+        m_AnchorPosition.z = playerPos.z;
+
+        UpdateCameraPosition();
     }
+
+    void UpdateCameraPosition()
+    {
+        Vector3 targetPosition = m_AnchorPosition - Vector3.forward * m_FollowDistance;
+        targetPosition.y = m_AnchorPosition.y + m_HeightOffset;
+
+        transform.position = Vector3.Lerp(transform.position, targetPosition, m_FollowSpeed * Time.deltaTime);
+    }
+
+#if UNITY_EDITOR
+    // 씬뷰에서 데드존 시각화
+    void OnDrawGizmosSelected()
+    {
+        Gizmos.color = new Color(0f, 1f, 0f, 0.3f);
+        Gizmos.DrawWireCube(m_AnchorPosition, new Vector3(m_DeadZoneX * 2f, m_DeadZoneY * 2f, 0.1f));
+    }
+#endif
 }

@@ -11,6 +11,13 @@ public class PlayerController : MonoBehaviour
     [SerializeField, Range(0.1f, 1f)]
     float m_MoveSpeed = 0.3f;
 
+    [Header("레인 전환 연출")]
+    [SerializeField] Transform m_VisualTransform;
+    [SerializeField] float m_TiltAngle = 20f;
+    [SerializeField] float m_TiltSpeed = 8f;
+    [SerializeField] AudioClip m_SkidClip;
+    [SerializeField, Range(0f, 1f)] float m_SkidVolume = 0.6f;
+
     [Header("Miss Zone 모드 (플레이어 뒤쪽 트리거 오브젝트에 붙일 때 체크)")]
     [SerializeField] bool m_IsMissZone = false;
 
@@ -18,9 +25,19 @@ public class PlayerController : MonoBehaviour
     bool m_bLeft;
     bool m_bRight;
     Vector3 m_TargetLocalPosition;
+    float m_TargetTilt;
+    float m_CurrentTilt;
+    Quaternion m_VisualBaseRotation;
+    AudioSource m_AudioSource;
 
     void Awake()
     {
+        m_AudioSource = gameObject.AddComponent<AudioSource>();
+        m_AudioSource.playOnAwake = false;
+
+        if (m_VisualTransform != null)
+            m_VisualBaseRotation = m_VisualTransform.localRotation;
+
         // Rigidbody: OnTriggerEnter 동작에 필요, kinematic으로 물리 영향 차단
         var rb = GetComponent<Rigidbody>();
         if (rb == null) rb = gameObject.AddComponent<Rigidbody>();
@@ -63,17 +80,45 @@ public class PlayerController : MonoBehaviour
         if (GameModeManager.instance != null && GameModeManager.instance.bGameOver) return;
 
         // 입력
-        if      (Input.GetKeyDown(KeyCode.A)) { m_bLeft = true;  m_bRight = false; }
-        else if (Input.GetKeyDown(KeyCode.D)) { m_bRight = true; m_bLeft  = false; }
-        else if (Input.GetKeyDown(KeyCode.S)) { m_bLeft  = false; m_bRight = false; }
+        if (Input.GetKeyDown(KeyCode.A))
+        {
+            m_bLeft = true; m_bRight = false;
+            m_CurrentTilt = m_TiltAngle;   // 즉시 꺾기
+            m_TargetTilt = 0f;             // 바로 복귀 목표
+            PlaySkid();
+        }
+        else if (Input.GetKeyDown(KeyCode.D))
+        {
+            m_bRight = true; m_bLeft = false;
+            m_CurrentTilt = -m_TiltAngle;  // 즉시 꺾기
+            m_TargetTilt = 0f;             // 바로 복귀 목표
+            PlaySkid();
+        }
+        else if (Input.GetKeyDown(KeyCode.S))
+        {
+            m_bLeft = false; m_bRight = false;
+        }
 
         // 레인 이동 (-X: 왼쪽, 0: 중앙, +X: 오른쪽)
         float lane = GameModeManager.instance != null ? GameModeManager.instance.laneOffset : 3f;
         float targetX = m_bLeft ? -lane : (m_bRight ? lane : 0f);
 
         m_TargetLocalPosition = new Vector3(targetX, 0f, 0f);
-
         transform.localPosition = Vector3.Lerp(transform.localPosition, m_TargetLocalPosition, m_MoveSpeed);
+
+        // 차체 기울기 — Quaternion으로 처리해 짐벌락 방지
+        if (m_VisualTransform != null)
+        {
+            m_CurrentTilt = Mathf.Lerp(m_CurrentTilt, m_TargetTilt, m_TiltSpeed * Time.deltaTime);
+            m_VisualTransform.localRotation =
+                m_VisualBaseRotation * Quaternion.AngleAxis(m_CurrentTilt, Vector3.right);
+        }
+    }
+
+    void PlaySkid()
+    {
+        if (m_SkidClip != null && m_AudioSource != null)
+            m_AudioSource.PlayOneShot(m_SkidClip, m_SkidVolume);
     }
 
     // ── 충돌 ─────────────────────────────────────
