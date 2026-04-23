@@ -60,6 +60,10 @@ public class ComboTracker : MonoBehaviour
             maxCombo = currentCombo;
         }
         OnComboChanged?.Invoke(currentCombo);
+
+        // 10 콤보마다 레인·노드·노래 속도 증가
+        if (currentCombo % 10 == 0 && GameModeManager.instance != null)
+            GameModeManager.instance.IncreaseSpeedByCombo(currentCombo);
     }
 
     /// <summary>

@@ -39,6 +39,9 @@ void MsgHandler::HandlePacket(Message& msg)
 	case PacketType::JoinGame:
 		HandleJoinGame(msg);
 		break;
+	case PacketType::SpeedLevel:
+		HandleSpeedLevel(msg);
+		break;
 	default:
 		HandleInvalid(msg);
 		break;
@@ -204,6 +207,18 @@ void HandleJoinGame(Message& msg)
 		return;
 
 	room->SendTarget(msg, pkt->userID);
+}
+
+void HandleSpeedLevel(Message& msg)
+{
+	CSpeedLevel* pkt = reinterpret_cast<CSpeedLevel*>(msg.Data());
+	if (pkt == nullptr) return;
+
+	RoomPtr room = RoomManager::Instance()->FindRoom(pkt->roomID);
+	if (room == nullptr) return;
+
+	room->SetSpeedLevel(pkt->userID, pkt->speedLevel);
+	std::cout << "[SpeedLevel] User " << pkt->userID << " → Level " << pkt->speedLevel << "\n";
 }
 
 void HandleLeave(Message& msg)

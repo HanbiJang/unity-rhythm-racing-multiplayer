@@ -17,6 +17,7 @@ enum PacketType : int
 	StartGame,
 	SpawnNode,
 	ScoreBroadcast,
+	SpeedLevel,   // Client → Server: 콤보 속도 레벨 전송
 	Max,
 };
 
@@ -120,5 +121,11 @@ struct CLeave
 {
 	uint64_t userID;
 	uint64_t roomID;
+};
+struct CSpeedLevel
+{
+	uint64_t userID;
+	uint64_t roomID;
+	int32_t  speedLevel;  // 0=기본, 1=콤보10, 2=콤보20, ...
 };
 #pragma pack(pop)

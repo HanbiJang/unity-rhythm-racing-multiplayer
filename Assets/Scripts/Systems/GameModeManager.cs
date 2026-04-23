@@ -33,7 +33,55 @@ public class GameModeManager : MonoBehaviour
 
     public void SetSpeed() { s_RoadMoveSpeed = m_RoadMoveSpeed; }
 
+    // ── 레이싱 속도 시스템 ────────────────────────────────
+    // 노드는 음악 타이밍 동기화를 위해 항상 기본 속도로 이동한다.
+    // 배경(InfiniteMapManager, EnvironmentScroller)만 콤보에 따라 빨라진다.
+    private float m_baseRoadSpeed;
+    private float m_backgroundSpeedMultiplier = 1f;
+    private int m_lastComboSpeedLevel = 0;
+    private const float BACKGROUND_SPEED_INCREMENT = 0.1f; // 콤보 10마다 배경 10% 증가
+    private const float MAX_BACKGROUND_MULTIPLIER = 2.5f;
 
+    /// <summary>노드 이동용 — 기본 속도 고정</summary>
+    public float EffectiveRoadSpeed => m_RoadMoveSpeed;
+
+    /// <summary>배경 이동용 — 콤보마다 빨라짐</summary>
+    public float EffectiveBackgroundSpeed => m_RoadMoveSpeed * m_backgroundSpeedMultiplier;
+
+    /// <summary>콤보 10 단계마다 배경 속도만 올리고, 서버에 SpeedLevel 패킷을 전송한다.</summary>
+    public void IncreaseSpeedByCombo(int combo)
+    {
+        int level = combo / 10;
+        if (level <= m_lastComboSpeedLevel) return;
+        m_lastComboSpeedLevel = level;
+
+        m_backgroundSpeedMultiplier = Mathf.Min(1f + level * BACKGROUND_SPEED_INCREMENT, MAX_BACKGROUND_MULTIPLIER);
+        Debug.Log($"[Racing] 콤보 {combo} → 배경 속도 {m_backgroundSpeedMultiplier:F2}x, SpeedLevel {level}");
+
+        SendSpeedLevelToServer(level);
+    }
+
+    /// <summary>Miss 발생 시 배경 속도를 기본으로 되돌리고 서버에 SpeedLevel 0을 전송한다.</summary>
+    public void ResetSpeedOnMiss()
+    {
+        m_backgroundSpeedMultiplier = 1f;
+        m_lastComboSpeedLevel = 0;
+        Debug.Log("[Racing] Miss → 배경 속도 기본값으로 리셋");
+
+        SendSpeedLevelToServer(0);
+    }
+
+    private void SendSpeedLevelToServer(int level)
+    {
+        if (ServerInterface.Instance == null) return;
+        if (!GameState.IsTestMode &&
+            (ServerInterface.Instance.SocketConnection == null ||
+             !ServerInterface.Instance.SocketConnection.Connected)) return;
+
+        var data = new SpeedLevelData(GameState.Instance.UserId, GameState.Instance.RoomId, level);
+        ServerInterface.Instance.SendDataToServer(
+            ServerInterface.Instance.SocketConnection, data, (int)EPacketID.SpeedLevel);
+    }
 
     public float m_CurrentTime { get; private set; }
     bool m_useSyncedClock = false;
@@ -98,6 +146,12 @@ public class GameModeManager : MonoBehaviour
             ComboTracker.Instance.ResetForNewGame();
         }
 
+        // 속도 초기화
+        m_RoadMoveSpeed = m_baseRoadSpeed;
+        m_backgroundSpeedMultiplier = 1f;
+        m_lastComboSpeedLevel = 0;
+        SetSpeed();
+
         bGameOver = false;
     }
 
@@ -141,6 +195,7 @@ public class GameModeManager : MonoBehaviour
     public void Apply()
     {
         m_RoadMoveSpeed = g_RoadMoveSpeed;
+        m_baseRoadSpeed = g_RoadMoveSpeed;
         SetSpeed();
     }
 

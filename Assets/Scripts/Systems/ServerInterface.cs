@@ -34,6 +34,7 @@ public enum EPacketID
     StartGame, //게임방에 있는 모든 유저가 ReadyGame 패킷을 전송하면 해당 패킷을 클라이언트에 전송
     SpawnNode, //게임방에서 장애물 생성
     ScoreBroadcast, //각 방에 있는 클라이언트들의 점수 동기화
+    SpeedLevel, //[Client → Server] 콤보 속도 레벨 전송 (서버가 추가 장애물 밀도 조절)
 
     //add another packet ID here
 

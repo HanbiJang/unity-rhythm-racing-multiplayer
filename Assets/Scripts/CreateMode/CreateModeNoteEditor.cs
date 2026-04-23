@@ -69,10 +69,10 @@ public class CreateModeNoteEditor : MonoBehaviour
     private bool isRecording;
     private float recordEndTime;
     private string status = "대기 중";
-    private float flashTimer;
-    private Texture2D flashTexture;
-    private readonly Color flashColor = new Color(0.2f, 1f, 0.2f, 1f);
-    private const float flashDuration = 0.18f;
+
+    private struct KeyLog { public string Text; public float ExpireTime; }
+    private readonly List<KeyLog> keyLogs = new List<KeyLog>();
+    private const float keyLogDuration = 1.5f;
 
     private void Start()
     {
@@ -103,17 +103,17 @@ public class CreateModeNoteEditor : MonoBehaviour
         if (Input.GetKeyDown(leftKey))
         {
             RecordHit(0);
-            TriggerFlash();
+            AddKeyLog("A 입력");
         }
         else if (Input.GetKeyDown(centerKey))
         {
             RecordHit(1);
-            TriggerFlash();
+            AddKeyLog("S 입력");
         }
         else if (Input.GetKeyDown(rightKey))
         {
             RecordHit(2);
-            TriggerFlash();
+            AddKeyLog("D 입력");
         }
     }
 
@@ -124,7 +124,7 @@ public class CreateModeNoteEditor : MonoBehaviour
             return;
         }
 
-        DrawFlashOverlay();
+        DrawKeyLogs();
     }
 
     private void StartRecording()
@@ -218,32 +218,37 @@ public class CreateModeNoteEditor : MonoBehaviour
         status = $"기록: {time:F3}s, pos={posIndex}";
     }
 
-    private void TriggerFlash()
+    private void AddKeyLog(string text)
     {
-        flashTimer = flashDuration;
+        keyLogs.Add(new KeyLog { Text = text, ExpireTime = Time.unscaledTime + keyLogDuration });
     }
 
-    private void DrawFlashOverlay()
+    private void DrawKeyLogs()
     {
-        if (flashTimer <= 0f)
-        {
-            return;
-        }
+        float now = Time.unscaledTime;
+        keyLogs.RemoveAll(k => k.ExpireTime <= now);
 
-        if (flashTexture == null)
+        GUIStyle style = new GUIStyle(GUI.skin.label)
         {
-            flashTexture = new Texture2D(1, 1, TextureFormat.RGBA32, false);
-            flashTexture.SetPixel(0, 0, flashColor);
-            flashTexture.Apply();
-        }
+            fontSize = 60,
+            fontStyle = FontStyle.Bold,
+            alignment = TextAnchor.MiddleCenter
+        };
 
-        flashTimer -= Time.unscaledDeltaTime;
-        float t = Mathf.Clamp01(flashTimer / flashDuration);
-        float alpha = Mathf.Sin(t * Mathf.PI); // 부드럽게 빠르게 깜빡임
-        Color guiColor = GUI.color;
-        GUI.color = new Color(flashColor.r, flashColor.g, flashColor.b, alpha);
-        GUI.DrawTexture(new Rect(0, 0, Screen.width, Screen.height), flashTexture);
-        GUI.color = guiColor;
+        float boxWidth = 300f;
+        float boxHeight = 100f;
+        float x = Screen.width * 0.5f - boxWidth * 0.5f;
+        float startY = Screen.height * 0.5f - 40f;
+
+        for (int i = keyLogs.Count - 1; i >= 0; i--)
+        {
+            float age = 1f - Mathf.Clamp01((keyLogs[i].ExpireTime - now) / keyLogDuration);
+            float alpha = 1f - age;
+
+            style.normal.textColor = new Color(0.2f, 1f, 0.2f, alpha);
+            float y = startY - (keyLogs.Count - 1 - i) * (boxHeight + 4f);
+            GUI.Label(new Rect(x, y, boxWidth, boxHeight), keyLogs[i].Text, style);
+        }
     }
 
     private List<NodeEntry> BuildNodeList(float duration)

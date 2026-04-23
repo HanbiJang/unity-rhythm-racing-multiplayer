@@ -136,6 +136,8 @@ public class PickupScript : MonoBehaviour
                 ComboTracker.Instance.ResetCombo();
         }
 
+        GameModeManager.instance?.ResetSpeedOnMiss();
+
         SendJudgementToServer(missResult);
         Destroy(gameObject);
     }

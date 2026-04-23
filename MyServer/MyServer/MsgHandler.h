@@ -9,6 +9,7 @@ void HandleRetryGame(Message& msg);
 void HandleEndGame(Message& msg);
 void HandleJoinGame(Message& msg);
 void HandleLeave(Message& msg);
+void HandleSpeedLevel(Message& msg);
 
 class MsgHandler
 {

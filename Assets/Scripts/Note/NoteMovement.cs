@@ -3,7 +3,7 @@ using UnityEngine;
 public class NoteMovement : MonoBehaviour
 {
     float Speed => GameModeManager.instance != null
-        ? GameModeManager.instance.m_RoadMoveSpeed
+        ? GameModeManager.instance.EffectiveRoadSpeed
         : 10f;
 
     void Update()

@@ -570,6 +570,27 @@ public class ScoreBroadcastData : PacketData
     }
 }
 
+[System.Serializable]
+// [Client -> Server] 콤보 속도 레벨 전송 — 서버가 추가 장애물 스폰 밀도를 조절한다
+public class SpeedLevelData : PacketData
+{
+    UInt64 _userID;
+    UInt64 _roomID;
+    int _speedLevel;  // 0=기본, 1=콤보10, 2=콤보20 ...
+
+    public UInt64 UserID    { get { return _userID;     } set { _userID     = value; } }
+    public UInt64 RoomID    { get { return _roomID;     } set { _roomID     = value; } }
+    public int    SpeedLevel { get { return _speedLevel; } set { _speedLevel = value; } }
+
+    public SpeedLevelData() { _userID = 0; _roomID = 0; _speedLevel = 0; }
+    public SpeedLevelData(UInt64 userID, UInt64 roomID, int speedLevel)
+    {
+        _userID     = userID;
+        _roomID     = roomID;
+        _speedLevel = speedLevel;
+    }
+}
+
 public class ScoreEntry
 {
     public ulong UserId { get; private set; }

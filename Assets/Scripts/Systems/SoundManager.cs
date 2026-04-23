@@ -165,4 +165,23 @@ public class SoundManager : MonoBehaviour
         audioSource.Stop();
     }
 
+    public void PauseMusic()
+    {
+        if (audioSource != null && audioSource.isPlaying)
+            audioSource.Pause();
+    }
+
+    public void ResumeMusic()
+    {
+        if (audioSource != null)
+            audioSource.UnPause();
+    }
+
+    /// <summary>재생 속도 배율 조절. 1.0이 기본 속도.</summary>
+    public void SetPitchMultiplier(float multiplier)
+    {
+        if (audioSource != null)
+            audioSource.pitch = Mathf.Clamp(multiplier, 0.5f, 3f);
+    }
+
 }

@@ -11,7 +11,7 @@ public class InfiniteMapManager : MonoBehaviour
     public Transform playerTransform;
 
     float Speed => GameModeManager.instance != null
-        ? GameModeManager.instance.m_RoadMoveSpeed
+        ? GameModeManager.instance.EffectiveBackgroundSpeed
         : 10f;
 
     void Update()
