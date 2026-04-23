@@ -57,6 +57,7 @@ public:
     uint64_t* GetUserList();
 
     void SpawnNode(NoteType type, NotePos pos, uint32_t nodeTimeMs = 0);
+    void SpawnFailNodesToOpponent(uint64_t senderUserID); // m_gameStateLock 보유 상태에서 호출
     void CalculateScore(uint64_t userID, uint32_t nodeType, uint32_t judgmentType = 0, float timeDifference = 0.0f, int32_t judgmentScore = 0);
     void SetSpeedLevel(uint64_t userID, int32_t speedLevel);
     void MakeScoreList();
@@ -90,6 +91,9 @@ private:
 
     int m_roomSpeedLevel;
     milliseconds m_nextExtraNodeTime;
+
+    std::map<uint64_t, int32_t> m_userSpeedLevels;
+    uint32_t m_penaltyNodeCounter;
 
     std::mutex m_netLock;
     std::mutex m_gameStateLock;

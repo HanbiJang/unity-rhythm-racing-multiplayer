@@ -103,7 +103,22 @@ public class PickupScript : MonoBehaviour
         }
 
         if (nodeType >= 3)
+        {
             ScreenFlashManager.Instance.PlayFailFeedback();
+
+            // Fail 노드: 점수 1000 차감 (0 미만으로는 내려가지 않음)
+            if (GameModeManager.instance != null)
+                GameModeManager.instance.m_PlayerScore = Mathf.Max(0f, GameModeManager.instance.m_PlayerScore - 1000f);
+
+            // 콤보 초기화
+            if (ComboTracker.Instance != null)
+                ComboTracker.Instance.ResetCombo();
+
+            GameModeManager.instance?.ResetSpeedOnMiss();
+
+            // 서버에 Miss 판정으로 전송 (서버 측 콤보/점수도 초기화)
+            judgmentResult = new JudgmentSystem.JudgmentResult(JudgmentSystem.JudgmentType.Miss, 0f, -1000);
+        }
 
         SendJudgementToServer(judgmentResult);
 

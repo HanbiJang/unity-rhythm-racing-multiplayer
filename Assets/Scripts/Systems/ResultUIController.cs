@@ -22,6 +22,9 @@ public class ResultUIController : MonoBehaviour
             var list = GameState.Instance.ScoreLIst; // List<KeyValuePair<ulong, ulong>>
             if (list == null) return;
 
+            bool isMulti = GameState.Instance.MatchMode == GameState.EMatchMode.Multi && list.Count > 1;
+            ulong myUserId = GameState.Instance.UserId;
+
             // 점수 내림차순 정렬 ( 점수 높은 인간이 상위에 )
             var sorted = new List<KeyValuePair<ulong, ulong>>(list);
             sorted.Sort((a, b) => b.Value.CompareTo(a.Value));
@@ -36,10 +39,30 @@ public class ResultUIController : MonoBehaviour
                 {
                     GameState.Instance.UserNicknames.TryGetValue(kv.Key, out nickname);
                 }
-                labels[0].text = $"User: {(string.IsNullOrEmpty(nickname) ? kv.Key.ToString() : nickname)}";
-                labels[1].text = $"Score: {kv.Value}";
+                labels[0].text = $" {(string.IsNullOrEmpty(nickname) ? kv.Key.ToString() : nickname)}";
+                labels[1].text = $" {kv.Value}";
 
-                // 첫 번째 랭킹(최고 점수)의 경우 "1st" 이미지 활성화
+                // 멀티 모드: 승리/패배 텍스트 표시
+                if (isMulti)
+                {
+                    bool isWinner = (i == 0);
+                    string resultText = isWinner ? "WIN" : "LOSE";
+
+                    // 프리팹에 "WinLoseText" 이름의 Text가 있으면 사용
+                    Transform winLoseTransform = go.transform.Find("WinLoseText");
+                    if (winLoseTransform != null)
+                    {
+                        var winLoseTxt = winLoseTransform.GetComponent<UnityEngine.UI.Text>();
+                        if (winLoseTxt != null) winLoseTxt.text = resultText;
+                    }
+                    else if (labels.Length >= 3)
+                    {
+                        // 세 번째 Text 컴포넌트를 폴백으로 사용
+                        labels[2].text = resultText;
+                    }
+                }
+
+/*                // 첫 번째 랭킹(최고 점수)의 경우 "1st" 이미지 활성화
                 if (i == 0)
                 {
                     // "1st" 이름을 가진 GameObject를 찾아서 활성화
@@ -63,7 +86,7 @@ public class ResultUIController : MonoBehaviour
                     {
                         Debug.LogWarning($"[ResultUIController] Could not find '1st' image in RankingItem prefab. Please ensure the GameObject is named '1st', '1st Image', or '1stImg'.");
                     }
-                }
+                }*/
             }
         }
 

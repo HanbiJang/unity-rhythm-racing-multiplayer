@@ -170,9 +170,7 @@ public class GameModeManager : MonoBehaviour
 
     // Start is called before the first frame update
     void Awake()
-    {
-        Screen.SetResolution(1080, 1920, false);
-        
+    {   
         // 이미 인스턴스가 있으면 새로 생성된 것을 파괴 (싱글톤 패턴)
         if (instance != null && instance != this)
         {

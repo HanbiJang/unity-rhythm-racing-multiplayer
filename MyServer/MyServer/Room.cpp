@@ -9,6 +9,8 @@
 #include <cstring>
 #include <fstream>
 #include <chrono>
+#include <random>
+#include <algorithm>
 
 #include "Room.h"
 #include "RoomManager.h"
@@ -40,6 +42,7 @@ Room::Room(uint64_t roomID, uint32_t maxSessionCount)
 	m_minPlayers = 1;
 	m_roomSpeedLevel = 0;
 	m_nextExtraNodeTime = milliseconds(-1);
+	m_penaltyNodeCounter = 0;
 	ContentLoader cl;
 	cl.Load(m_nodeList);
 	m_nodeIndex = 0;
@@ -206,7 +209,7 @@ void Room::SetNickname(uint64_t userID, uint64_t nicknamePart1, uint64_t nicknam
 {
 	std::lock_guard<std::mutex> lockGuard(m_gameStateLock);
 	std::string nickname = DecodeNickname(nicknamePart1, nicknamePart2);
-	m_userNicknames[userID] = nickname.empty() ? "Player" : nickname;
+	m_userNicknames[userID] = nickname.empty() ? "Player" + std::to_string(userID) : nickname;
 }
 
 void Room::SetMatchMode(uint32_t matchMode)
@@ -277,9 +280,59 @@ void Room::SetSpeedLevel(uint64_t userID, int32_t speedLevel)
 	std::lock_guard<std::mutex> lockGuard(m_gameStateLock);
 	if (m_gameStates.find(userID) == m_gameStates.end()) return;
 
+	int32_t prevLevel = m_userSpeedLevels.count(userID) ? m_userSpeedLevels[userID] : 0;
+	m_userSpeedLevels[userID] = speedLevel;
+
 	m_roomSpeedLevel = (std::max)(0, speedLevel);
 	if (m_roomSpeedLevel == 0)
 		m_nextExtraNodeTime = milliseconds(-1);
+
+	// 속도 레벨이 증가했고 멀티 게임 중일 때 상대에게 Fail 노드 2개 소환
+	if (speedLevel > prevLevel && speedLevel > 0 && m_sessions.size() >= 2)
+	{
+		SpawnFailNodesToOpponent(userID);
+	}
+}
+
+void Room::SpawnFailNodesToOpponent(uint64_t senderUserID)
+{
+	// 상대 세션 찾기
+	SessionPtr opponentSession = nullptr;
+	for (auto& pair : m_sessions)
+	{
+		if (pair.first != senderUserID)
+		{
+			opponentSession = pair.second;
+			break;
+		}
+	}
+	if (opponentSession == nullptr) return;
+
+	// 2개의 중복 없는 랜덤 레인 선택 (0=Left, 1=Center, 2=Right)
+	static std::mt19937 rng(std::random_device{}());
+	std::vector<int> lanes = { 0, 1, 2 };
+	std::shuffle(lanes.begin(), lanes.end(), rng);
+
+	NoteType failType = NoteType::AFail;
+
+	for (int i = 0; i < 2; ++i)
+	{
+		// 비트맵 노트 시간(0~수십만ms)과 겹치지 않도록 1,000,000ms 이상 범위 사용
+		uint32_t nodeTimeMs = 1000000u + (m_penaltyNodeCounter * 3u) + static_cast<uint32_t>(i);
+		NotePos pos = static_cast<NotePos>(lanes[i]);
+
+		Message msg;
+		msg.PutData(reinterpret_cast<char*>(&failType), sizeof(NoteType));
+		msg.PutData(reinterpret_cast<char*>(&pos), sizeof(NotePos));
+		msg.PutData(reinterpret_cast<char*>(&nodeTimeMs), sizeof(uint32_t));
+		msg.EncodeHeader(PacketType::SpawnNode);
+
+		opponentSession->Deliver(msg);
+	}
+
+	++m_penaltyNodeCounter;
+	std::cout << "[Penalty] Spawned 2 Fail nodes to opponent of User " << senderUserID
+		<< " (Lanes: " << lanes[0] << ", " << lanes[1] << ")\n";
 }
 
 void Room::SpawnNode(NoteType type, NotePos pos, uint32_t nodeTimeMs)

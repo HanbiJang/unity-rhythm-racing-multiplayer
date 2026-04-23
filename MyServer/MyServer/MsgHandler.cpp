@@ -218,7 +218,7 @@ void HandleSpeedLevel(Message& msg)
 	if (room == nullptr) return;
 
 	room->SetSpeedLevel(pkt->userID, pkt->speedLevel);
-	std::cout << "[SpeedLevel] User " << pkt->userID << " → Level " << pkt->speedLevel << "\n";
+	// std::cout << "[SpeedLevel] User " << pkt->userID << " → Level " << pkt->speedLevel << "\n";
 }
 
 void HandleLeave(Message& msg)
