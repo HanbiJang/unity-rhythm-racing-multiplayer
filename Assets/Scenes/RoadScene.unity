@@ -3644,10 +3644,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   nodeHitClips:
   - {fileID: 8300000, guid: 98b629baa0ef15e42a70b9300228ebfb, type: 3}
-  - {fileID: 8300000, guid: 9039d313685cab648845caa3bed47a0d, type: 3}
-  - {fileID: 8300000, guid: 5b669c57ea0e08e46b2222262608a865, type: 3}
-  - {fileID: 8300000, guid: 5b669c57ea0e08e46b2222262608a865, type: 3}
-  - {fileID: 8300000, guid: 5b669c57ea0e08e46b2222262608a865, type: 3}
   - {fileID: 8300000, guid: 5b669c57ea0e08e46b2222262608a865, type: 3}
   defaultHitClip: {fileID: 8300000, guid: 98b629baa0ef15e42a70b9300228ebfb, type: 3}
   volume: 1
