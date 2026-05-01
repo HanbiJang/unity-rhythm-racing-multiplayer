@@ -62,11 +62,11 @@ public class HitEffectManager : MonoBehaviour
         }
     }
 
-    // 판정 타입별 색상
-    static readonly Color ColorPerfect = new Color(1f, 0.85f, 0f);   // 골드
-    static readonly Color ColorGood    = new Color(0f, 1f, 0.4f);    // 초록
-    static readonly Color ColorBad     = new Color(0.3f, 0.5f, 1f);  // 파랑
-    static readonly Color ColorDefault = Color.white;
+    [Header("판정 타입별 색상")]
+    [SerializeField] private Color ColorPerfect = new Color(1f, 0.85f, 0f);   // 골드
+    [SerializeField] private Color ColorGood    = new Color(0f, 1f, 0.4f);    // 초록
+    [SerializeField] private Color ColorBad     = new Color(0.3f, 0.5f, 1f);  // 파랑
+    [SerializeField] private Color ColorDefault = Color.white;
 
     /// <summary>판정 타입에 맞는 색상으로 이펙트를 재생합니다.</summary>
     public void PlayJudgmentEffect(Vector3 hitPosition, JudgmentSystem.JudgmentType type)
@@ -145,4 +145,3 @@ public class HitEffectManager : MonoBehaviour
     }
 
 }
-

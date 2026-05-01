@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b94fcd11afffcb142908bfcb1e261fba, type: 3}
   m_Name: MotionBlur
   m_EditorClassIdentifier: 
-  active: 1
+  active: 0
   enabled:
     overrideState: 1
     value: 1
@@ -49,10 +49,10 @@ MonoBehaviour:
     value: {x: 0.5, y: 0.5}
   intensity:
     overrideState: 1
-    value: 0.374
+    value: 0.429
   smoothness:
     overrideState: 1
-    value: 0.283
+    value: 0.505
   roundness:
     overrideState: 0
     value: 1
@@ -106,7 +106,7 @@ MonoBehaviour:
     defaultState: 1
   intensity:
     overrideState: 1
-    value: 0.517
+    value: 0.31
   fastMode:
     overrideState: 0
     value: 0
@@ -162,20 +162,20 @@ MonoBehaviour:
     overrideState: 0
     value: 1
   temperature:
-    overrideState: 0
-    value: 0
+    overrideState: 1
+    value: -12
   tint:
-    overrideState: 0
-    value: 0
+    overrideState: 1
+    value: 27
   colorFilter:
     overrideState: 0
-    value: {r: 1, g: 1, b: 1, a: 1}
+    value: {r: 0.087908536, g: 0.1433848, b: 0.20910282, a: 1}
   hueShift:
     overrideState: 1
-    value: -58
+    value: -4
   saturation:
-    overrideState: 1
-    value: 20
+    overrideState: 0
+    value: 0
   brightness:
     overrideState: 0
     value: 0
@@ -183,8 +183,8 @@ MonoBehaviour:
     overrideState: 0
     value: 0
   contrast:
-    overrideState: 0
-    value: 0
+    overrideState: 1
+    value: 6
   mixerRedOutRedIn:
     overrideState: 0
     value: 100
@@ -1457,7 +1457,7 @@ MonoBehaviour:
     value: 0
   color:
     overrideState: 0
-    value: {r: 1, g: 1, b: 1, a: 1}
+    value: {r: 0.36320752, g: 0.80339146, b: 1, a: 1}
   fastMode:
     overrideState: 0
     value: 0
