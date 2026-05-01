@@ -193,6 +193,47 @@ public class JudgmentSystem : MonoBehaviour
         goodWindow = good;
         badWindow = bad;
     }
+
+    [Header("거리 기반 판정 범위 (Z축)")]
+    [SerializeField] private float perfectDistanceWindow = 0.4f;  // |zDiff| 이하면 Perfect
+    [SerializeField] private float goodDistanceWindow    = 1.0f;  // |zDiff| 이하면 Good
+    [SerializeField] private float badDistanceWindow     = 1.92f; // |zDiff| 이하면 Bad, 초과면 Miss
+
+    /// <summary>
+    /// 노트와 플레이어 간 Z 거리 기반으로 판정합니다.
+    /// 트리거 존 중앙에 가까울수록 Perfect, 멀수록 Bad.
+    /// </summary>
+    public JudgmentResult JudgeByDistance(float noteZ, float playerZ)
+    {
+        float zDiff = Mathf.Abs(noteZ - playerZ);
+
+        JudgmentType type;
+        int score;
+
+        if (zDiff <= perfectDistanceWindow)
+        {
+            type  = JudgmentType.Perfect;
+            score = perfectScore;
+        }
+        else if (zDiff <= goodDistanceWindow)
+        {
+            type  = JudgmentType.Good;
+            score = goodScore;
+        }
+        else if (zDiff <= badDistanceWindow)
+        {
+            type  = JudgmentType.Bad;
+            score = badScore;
+        }
+        else
+        {
+            type  = JudgmentType.Miss;
+            score = missScore;
+        }
+
+        Debug.Log($"[JudgmentSystem] DistanceJudge: {GetJudgmentTypeString(type)}, zDiff={zDiff:F3}");
+        return new JudgmentResult(type, zDiff, score);
+    }
 }
 
 

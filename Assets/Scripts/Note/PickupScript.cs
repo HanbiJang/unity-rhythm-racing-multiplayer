@@ -58,14 +58,13 @@ public class PickupScript : MonoBehaviour
             NodeSfxManager.Instance.PlayNodeHit(nodeType);
 
         JudgmentSystem.JudgmentResult judgmentResult = null;
-        if (hasExpectedTime && JudgmentSystem.Instance != null && GameModeManager.instance != null)
+        if (JudgmentSystem.Instance != null)
         {
-            float currentTime = GameModeManager.instance.m_CurrentTime;
-            judgmentResult = JudgmentSystem.Instance.Judge(expectedTime, currentTime);
+            judgmentResult = JudgmentSystem.Instance.JudgeByDistance(transform.position.z, crusherPosition.z);
 
             Debug.Log($"[PickupScript] Judgment: {JudgmentSystem.GetJudgmentTypeString(judgmentResult.type)}, " +
-                      $"Expected: {expectedTime:F3}s, Current: {currentTime:F3}s, " +
-                      $"Diff: {judgmentResult.timeDifference:F3}s, Score: {judgmentResult.score}");
+                      $"NoteZ: {transform.position.z:F3}, PlayerZ: {crusherPosition.z:F3}, " +
+                      $"ZDiff: {judgmentResult.timeDifference:F3}, Score: {judgmentResult.score}");
 
             if (JudgmentDisplayUI.Instance != null)
                 JudgmentDisplayUI.Instance.ShowJudgment(judgmentResult.type);
@@ -101,6 +100,10 @@ public class PickupScript : MonoBehaviour
             else
                 HitEffectManager.Instance.PlayAllEffects(hitPoint);
         }
+
+        // 별똥별 이펙트: 플레이어 위치 → ScoreText
+        if (ScoreFlyEffect.Instance != null && nodeType < 3)
+            ScoreFlyEffect.Instance.Play(crusherPosition);
 
         if (nodeType >= 3)
         {

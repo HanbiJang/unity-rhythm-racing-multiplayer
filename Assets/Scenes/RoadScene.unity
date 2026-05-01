@@ -976,6 +976,64 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 1203070886147202344, guid: 4b13f1b503aa55240b4cd034878bee6f, type: 3}
   m_PrefabInstance: {fileID: 8412060840822864768}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &505790422
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 505790423}
+  - component: {fileID: 505790424}
+  m_Layer: 5
+  m_Name: ScoreFlyEffect
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &505790423
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 505790422}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1810647611}
+  m_RootOrder: 8
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &505790424
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 505790422}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0935a5007246272489b6af4883be8f8f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_ScoreTextRect: {fileID: 2047121072}
+  m_Canvas: {fileID: 1001669438}
+  m_StarSprite: {fileID: 21300000, guid: 1b6009aeae92d4c438aa9dd99414985e, type: 3}
+  m_StarColor: {r: 1, g: 1, b: 1, a: 0.43137255}
+  m_StarSize: 30
+  m_StarCount: 5
+  m_SpawnDelay: 0.06
+  m_FlyDuration: 0.6
+  m_ArcHeight: 80
 --- !u!1 &595588961
 GameObject:
   m_ObjectHideFlags: 0
@@ -2488,6 +2546,9 @@ MonoBehaviour:
   goodScore: 50
   badScore: 10
   missScore: 0
+  perfectDistanceWindow: 1.2
+  goodDistanceWindow: 2.5
+  badDistanceWindow: 3.5
 --- !u!1 &1448895225 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 6822371010852637586, guid: 9c5492ad8782f704380c242a1d62d7af, type: 3}
@@ -3381,6 +3442,7 @@ RectTransform:
   - {fileID: 1342888604}
   - {fileID: 1909631368}
   - {fileID: 1261204265}
+  - {fileID: 505790423}
   m_Father: {fileID: 1001669439}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

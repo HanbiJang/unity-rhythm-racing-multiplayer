@@ -93,15 +93,7 @@ public class UIManager : MonoBehaviour
     {
         GameState.Instance.MatchMode = mode;
         GameState.Instance.PlayerNickname = GetNicknameForMode(mode);
-        if (mode == GameState.EMatchMode.Multi)
-        {
-            ShowLoading(); // 멀티만 매칭 대기 로딩 표시
-        }
-        else
-        {
-            HideLoading();
-        }
-
+        ShowLoading(); // Solo/Multi 모두 로딩 화면 표시
         ServerInterface.Instance.ConnectToTcpServer(GameState.Instance.Ip, GameState.Instance.PortNum);
     }
 
