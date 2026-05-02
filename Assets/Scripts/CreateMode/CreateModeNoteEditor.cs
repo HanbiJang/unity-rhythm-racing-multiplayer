@@ -50,8 +50,10 @@ public class CreateModeNoteEditor : MonoBehaviour
     [Header("Hit Timing Simulation")]
     [Tooltip("실제 게임에서 노트가 생성되는 위치와 플레이어 사이 거리. SpwanerFollower가 씬에 있으면 GapBetweenPlayer 값을 자동으로 사용하고, 없을 때만 이 값을 사용합니다.")]
     [SerializeField] private float simulationGapDistance = 30f;
-    [Tooltip("실제 게임에서 노트가 이동하는 속도 (노트 프리팹의 PathFollower.speed 와 동일하게 맞추세요).")]
-    [SerializeField] private float simulationNodeSpeed = 10f;
+    [Tooltip("실제 게임에서 노트가 이동하는 속도 (GameModeManager.m_RoadMoveSpeed 와 동일하게 맞추세요).")]
+    [SerializeField] private float simulationNodeSpeed = 40f;
+    [Tooltip("인게임씬에서의 SpawnerFollower - GapBetweenPlayer와 같은 값을 사용해야합니다")]
+    [SerializeField] private float GapBetweenPlayer = 30f;
 
     [Header("XML Output")]
     [SerializeField] private string outputRelativePath = "MyServer/MyServer/MusicNodeData.xml";
@@ -261,11 +263,11 @@ public class CreateModeNoteEditor : MonoBehaviour
         // 서버에 넘기는 XML Time 값은 "스폰 시점 = 히트 타이밍 - 이동 시간" 이 되어야 합니다.
 
         // 실제 GapBetweenPlayer(SpwanerFollower) 값을 우선 사용, 없으면 simulationGapDistance 사용
-        float gapDistance = simulationGapDistance;
-        SpwanerFollower spawnerFollower = FindObjectOfType<SpwanerFollower>();
-        if (spawnerFollower != null && spawnerFollower.GapBetweenPlayer > 0f)
+        float gapDistance = simulationGapDistance;  
+
+        if (GapBetweenPlayer > 0f)
         {
-            gapDistance = spawnerFollower.GapBetweenPlayer;
+            gapDistance = GapBetweenPlayer;
         }
 
         float travelTime = 0f;
@@ -301,7 +303,6 @@ public class CreateModeNoteEditor : MonoBehaviour
             float candidateHitTime = candidateTimes[pickIndex];
             candidateTimes.RemoveAt(pickIndex);
 
-            // 실패 노드도 동일하게, "해당 타이밍에 플레이어 앞에서 맞부딪히도록" 스폰 시점을 앞당김
             float time = Mathf.Max(0f, candidateHitTime - travelTime);
 
             result.Add(new NodeEntry

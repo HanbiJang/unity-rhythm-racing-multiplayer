@@ -133,6 +133,13 @@ public class PickupScript : MonoBehaviour
     {
         Debug.Log("Missed : " + name);
 
+        // Fail 노트(type >= 3)는 피하는 게 정답 → 판정/콤보/속도 처리 없이 제거만
+        if (nodeType >= 3)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
         JudgmentSystem.JudgmentResult missResult = null;
         if (JudgmentSystem.Instance != null && GameModeManager.instance != null)
         {

@@ -2,13 +2,12 @@ using UnityEngine;
 
 public class SpwanerFollower : MonoBehaviour
 {
-    [SerializeField]
     public float GapBetweenPlayer = 30f;
 
     // 외부(SpawnNode)에서 속도를 읽을 때 사용 — GameModeManager 값을 반환
     public float speed => GameModeManager.instance != null
         ? GameModeManager.instance.m_RoadMoveSpeed
-        : 10f;
+        : 40f;
 
     private Transform playerTransform;
 

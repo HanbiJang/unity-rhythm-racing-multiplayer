@@ -1,523 +1,253 @@
 <?xml version="1.0" encoding="utf-8"?>
 <AllNode>
   <Node>
-    <Time>0.000</Time>
-    <Type>1</Type>
-    <Pos>1</Pos>
-  </Node>
-  <Node>
-    <Time>0.000</Time>
-    <Type>1</Type>
-    <Pos>1</Pos>
-  </Node>
-  <Node>
-    <Time>0.000</Time>
-    <Type>2</Type>
-    <Pos>1</Pos>
-  </Node>
-  <Node>
-    <Time>0.000</Time>
-    <Type>1</Type>
-    <Pos>1</Pos>
-  </Node>
-  <Node>
-    <Time>0.008</Time>
-    <Type>0</Type>
-    <Pos>1</Pos>
-  </Node>
-  <Node>
-    <Time>0.563</Time>
-    <Type>2</Type>
-    <Pos>1</Pos>
-  </Node>
-  <Node>
-    <Time>1.075</Time>
-    <Type>1</Type>
-    <Pos>1</Pos>
-  </Node>
-  <Node>
-    <Time>1.651</Time>
-    <Type>2</Type>
-    <Pos>0</Pos>
-  </Node>
-  <Node>
-    <Time>2.184</Time>
-    <Type>0</Type>
-    <Pos>2</Pos>
-  </Node>
-  <Node>
-    <Time>2.739</Time>
+    <Time>3.901</Time>
     <Type>1</Type>
     <Pos>0</Pos>
   </Node>
   <Node>
-    <Time>3.293</Time>
-    <Type>0</Type>
-    <Pos>2</Pos>
-  </Node>
-  <Node>
-    <Time>3.869</Time>
-    <Type>0</Type>
-    <Pos>0</Pos>
-  </Node>
-  <Node>
-    <Time>4.424</Time>
-    <Type>0</Type>
-    <Pos>2</Pos>
-  </Node>
-  <Node>
-    <Time>4.957</Time>
-    <Type>1</Type>
-    <Pos>0</Pos>
-  </Node>
-  <Node>
-    <Time>5.512</Time>
+    <Time>4.455</Time>
     <Type>1</Type>
     <Pos>2</Pos>
   </Node>
   <Node>
-    <Time>6.088</Time>
-    <Type>0</Type>
-    <Pos>0</Pos>
-  </Node>
-  <Node>
-    <Time>6.664</Time>
-    <Type>0</Type>
-    <Pos>2</Pos>
-  </Node>
-  <Node>
-    <Time>7.197</Time>
-    <Type>0</Type>
-    <Pos>0</Pos>
-  </Node>
-  <Node>
-    <Time>7.752</Time>
+    <Time>5.010</Time>
     <Type>1</Type>
-    <Pos>2</Pos>
-  </Node>
-  <Node>
-    <Time>8.285</Time>
-    <Type>2</Type>
     <Pos>0</Pos>
   </Node>
   <Node>
-    <Time>8.904</Time>
-    <Type>1</Type>
-    <Pos>2</Pos>
-  </Node>
-  <Node>
-    <Time>9.437</Time>
-    <Type>2</Type>
-    <Pos>0</Pos>
-  </Node>
-  <Node>
-    <Time>9.971</Time>
+    <Time>5.543</Time>
     <Type>2</Type>
     <Pos>2</Pos>
   </Node>
   <Node>
-    <Time>10.525</Time>
-    <Type>0</Type>
-    <Pos>1</Pos>
-  </Node>
-  <Node>
-    <Time>11.123</Time>
-    <Type>2</Type>
-    <Pos>1</Pos>
-  </Node>
-  <Node>
-    <Time>11.677</Time>
-    <Type>0</Type>
-    <Pos>1</Pos>
-  </Node>
-  <Node>
-    <Time>12.211</Time>
-    <Type>0</Type>
-    <Pos>1</Pos>
-  </Node>
-  <Node>
-    <Time>12.765</Time>
+    <Time>6.119</Time>
     <Type>1</Type>
     <Pos>0</Pos>
   </Node>
   <Node>
-    <Time>13.299</Time>
+    <Time>6.695</Time>
     <Type>2</Type>
     <Pos>2</Pos>
   </Node>
   <Node>
-    <Time>13.917</Time>
+    <Time>7.250</Time>
     <Type>0</Type>
     <Pos>0</Pos>
   </Node>
   <Node>
-    <Time>14.408</Time>
-    <Type>2</Type>
-    <Pos>2</Pos>
-  </Node>
-  <Node>
-    <Time>14.984</Time>
-    <Type>0</Type>
-    <Pos>1</Pos>
-  </Node>
-  <Node>
-    <Time>15.581</Time>
-    <Type>0</Type>
-    <Pos>1</Pos>
-  </Node>
-  <Node>
-    <Time>16.115</Time>
-    <Type>1</Type>
-    <Pos>1</Pos>
-  </Node>
-  <Node>
-    <Time>16.627</Time>
-    <Type>2</Type>
-    <Pos>1</Pos>
-  </Node>
-  <Node>
-    <Time>17.160</Time>
-    <Type>0</Type>
-    <Pos>0</Pos>
-  </Node>
-  <Node>
-    <Time>17.736</Time>
-    <Type>1</Type>
-    <Pos>2</Pos>
-  </Node>
-  <Node>
-    <Time>18.333</Time>
-    <Type>1</Type>
-    <Pos>0</Pos>
-  </Node>
-  <Node>
-    <Time>18.888</Time>
+    <Time>7.805</Time>
     <Type>0</Type>
     <Pos>2</Pos>
   </Node>
   <Node>
-    <Time>19.421</Time>
+    <Time>8.359</Time>
+    <Type>0</Type>
+    <Pos>1</Pos>
+  </Node>
+  <Node>
+    <Time>8.893</Time>
     <Type>1</Type>
     <Pos>1</Pos>
   </Node>
   <Node>
-    <Time>19.976</Time>
+    <Time>9.469</Time>
+    <Type>1</Type>
+    <Pos>1</Pos>
+  </Node>
+  <Node>
+    <Time>10.002</Time>
+    <Type>0</Type>
+    <Pos>1</Pos>
+  </Node>
+  <Node>
+    <Time>10.578</Time>
+    <Type>0</Type>
+    <Pos>1</Pos>
+  </Node>
+  <Node>
+    <Time>11.154</Time>
+    <Type>1</Type>
+    <Pos>1</Pos>
+  </Node>
+  <Node>
+    <Time>11.687</Time>
     <Type>2</Type>
     <Pos>1</Pos>
   </Node>
   <Node>
-    <Time>20.573</Time>
+    <Time>12.242</Time>
     <Type>1</Type>
     <Pos>1</Pos>
   </Node>
   <Node>
-    <Time>21.085</Time>
-    <Type>2</Type>
-    <Pos>1</Pos>
-  </Node>
-  <Node>
-    <Time>21.640</Time>
-    <Type>1</Type>
-    <Pos>0</Pos>
-  </Node>
-  <Node>
-    <Time>22.195</Time>
-    <Type>0</Type>
-    <Pos>2</Pos>
-  </Node>
-  <Node>
-    <Time>22.728</Time>
+    <Time>12.775</Time>
     <Type>2</Type>
     <Pos>0</Pos>
   </Node>
   <Node>
-    <Time>23.304</Time>
-    <Type>1</Type>
-    <Pos>2</Pos>
-  </Node>
-  <Node>
-    <Time>23.859</Time>
-    <Type>1</Type>
-    <Pos>1</Pos>
-  </Node>
-  <Node>
-    <Time>24.413</Time>
-    <Type>2</Type>
-    <Pos>1</Pos>
-  </Node>
-  <Node>
-    <Time>24.968</Time>
-    <Type>0</Type>
-    <Pos>1</Pos>
-  </Node>
-  <Node>
-    <Time>25.544</Time>
-    <Type>1</Type>
-    <Pos>1</Pos>
-  </Node>
-  <Node>
-    <Time>26.056</Time>
-    <Type>1</Type>
-    <Pos>0</Pos>
-  </Node>
-  <Node>
-    <Time>26.632</Time>
-    <Type>0</Type>
-    <Pos>2</Pos>
-  </Node>
-  <Node>
-    <Time>27.165</Time>
-    <Type>1</Type>
-    <Pos>0</Pos>
-  </Node>
-  <Node>
-    <Time>27.784</Time>
-    <Type>1</Type>
-    <Pos>2</Pos>
-  </Node>
-  <Node>
-    <Time>28.317</Time>
-    <Type>2</Type>
-    <Pos>1</Pos>
-  </Node>
-  <Node>
-    <Time>28.893</Time>
-    <Type>2</Type>
-    <Pos>1</Pos>
-  </Node>
-  <Node>
-    <Time>29.427</Time>
-    <Type>0</Type>
-    <Pos>1</Pos>
-  </Node>
-  <Node>
-    <Time>29.981</Time>
-    <Type>2</Type>
-    <Pos>1</Pos>
-  </Node>
-  <Node>
-    <Time>30.515</Time>
-    <Type>1</Type>
-    <Pos>0</Pos>
-  </Node>
-  <Node>
-    <Time>31.069</Time>
+    <Time>13.309</Time>
     <Type>2</Type>
     <Pos>2</Pos>
   </Node>
   <Node>
-    <Time>31.645</Time>
+    <Time>13.885</Time>
+    <Type>0</Type>
+    <Pos>0</Pos>
+  </Node>
+  <Node>
+    <Time>14.461</Time>
+    <Type>1</Type>
+    <Pos>2</Pos>
+  </Node>
+  <Node>
+    <Time>15.015</Time>
+    <Type>1</Type>
+    <Pos>0</Pos>
+  </Node>
+  <Node>
+    <Time>15.591</Time>
+    <Type>1</Type>
+    <Pos>2</Pos>
+  </Node>
+  <Node>
+    <Time>16.125</Time>
     <Type>2</Type>
     <Pos>0</Pos>
   </Node>
   <Node>
-    <Time>32.179</Time>
+    <Time>16.701</Time>
     <Type>0</Type>
     <Pos>2</Pos>
   </Node>
   <Node>
-    <Time>32.755</Time>
-    <Type>1</Type>
-    <Pos>1</Pos>
-  </Node>
-  <Node>
-    <Time>33.309</Time>
+    <Time>17.213</Time>
     <Type>2</Type>
     <Pos>1</Pos>
   </Node>
   <Node>
-    <Time>33.864</Time>
-    <Type>0</Type>
+    <Time>17.789</Time>
+    <Type>1</Type>
     <Pos>1</Pos>
   </Node>
   <Node>
-    <Time>34.419</Time>
+    <Time>18.343</Time>
+    <Type>1</Type>
+    <Pos>1</Pos>
+  </Node>
+  <Node>
+    <Time>18.941</Time>
     <Type>2</Type>
     <Pos>1</Pos>
   </Node>
   <Node>
-    <Time>34.973</Time>
-    <Type>0</Type>
-    <Pos>0</Pos>
-  </Node>
-  <Node>
-    <Time>35.549</Time>
-    <Type>0</Type>
-    <Pos>2</Pos>
-  </Node>
-  <Node>
-    <Time>36.104</Time>
-    <Type>1</Type>
-    <Pos>0</Pos>
-  </Node>
-  <Node>
-    <Time>36.616</Time>
-    <Type>0</Type>
-    <Pos>2</Pos>
-  </Node>
-  <Node>
-    <Time>37.171</Time>
+    <Time>19.474</Time>
     <Type>1</Type>
     <Pos>1</Pos>
   </Node>
   <Node>
-    <Time>37.725</Time>
+    <Time>20.007</Time>
     <Type>1</Type>
     <Pos>1</Pos>
   </Node>
   <Node>
-    <Time>38.301</Time>
-    <Type>0</Type>
-    <Pos>1</Pos>
-  </Node>
-  <Node>
-    <Time>38.856</Time>
-    <Type>0</Type>
-    <Pos>1</Pos>
-  </Node>
-  <Node>
-    <Time>39.389</Time>
-    <Type>1</Type>
-    <Pos>0</Pos>
-  </Node>
-  <Node>
-    <Time>39.965</Time>
-    <Type>0</Type>
+    <Time>20.250</Time>
+    <Type>5</Type>
     <Pos>2</Pos>
   </Node>
   <Node>
-    <Time>40.477</Time>
+    <Time>20.541</Time>
+    <Type>0</Type>
+    <Pos>1</Pos>
+  </Node>
+  <Node>
+    <Time>21.117</Time>
     <Type>1</Type>
+    <Pos>1</Pos>
+  </Node>
+  <Node>
+    <Time>21.650</Time>
+    <Type>0</Type>
     <Pos>0</Pos>
   </Node>
   <Node>
-    <Time>41.053</Time>
-    <Type>0</Type>
+    <Time>22.205</Time>
+    <Type>1</Type>
     <Pos>2</Pos>
   </Node>
   <Node>
-    <Time>41.651</Time>
+    <Time>22.781</Time>
     <Type>2</Type>
     <Pos>0</Pos>
   </Node>
   <Node>
-    <Time>42.205</Time>
+    <Time>23.335</Time>
     <Type>1</Type>
     <Pos>2</Pos>
   </Node>
   <Node>
-    <Time>42.803</Time>
+    <Time>23.890</Time>
+    <Type>2</Type>
+    <Pos>0</Pos>
+  </Node>
+  <Node>
+    <Time>24.466</Time>
+    <Type>1</Type>
+    <Pos>2</Pos>
+  </Node>
+  <Node>
+    <Time>24.999</Time>
     <Type>1</Type>
     <Pos>0</Pos>
   </Node>
   <Node>
-    <Time>43.336</Time>
+    <Time>25.533</Time>
     <Type>0</Type>
     <Pos>2</Pos>
   </Node>
   <Node>
-    <Time>43.869</Time>
-    <Type>2</Type>
-    <Pos>0</Pos>
-  </Node>
-  <Node>
-    <Time>44.424</Time>
-    <Type>0</Type>
-    <Pos>2</Pos>
-  </Node>
-  <Node>
-    <Time>44.979</Time>
-    <Type>0</Type>
-    <Pos>0</Pos>
-  </Node>
-  <Node>
-    <Time>45.555</Time>
-    <Type>2</Type>
-    <Pos>2</Pos>
-  </Node>
-  <Node>
-    <Time>46.088</Time>
-    <Type>0</Type>
-    <Pos>1</Pos>
-  </Node>
-  <Node>
-    <Time>46.600</Time>
+    <Time>26.109</Time>
     <Type>1</Type>
     <Pos>1</Pos>
   </Node>
   <Node>
-    <Time>47.197</Time>
+    <Time>26.663</Time>
+    <Type>0</Type>
+    <Pos>1</Pos>
+  </Node>
+  <Node>
+    <Time>27.000</Time>
+    <Type>5</Type>
+    <Pos>0</Pos>
+  </Node>
+  <Node>
+    <Time>27.197</Time>
+    <Type>1</Type>
+    <Pos>1</Pos>
+  </Node>
+  <Node>
+    <Time>27.751</Time>
     <Type>2</Type>
     <Pos>1</Pos>
   </Node>
   <Node>
-    <Time>47.773</Time>
+    <Time>28.285</Time>
     <Type>1</Type>
     <Pos>1</Pos>
   </Node>
   <Node>
-    <Time>48.307</Time>
+    <Time>28.861</Time>
+    <Type>0</Type>
+    <Pos>1</Pos>
+  </Node>
+  <Node>
+    <Time>29.415</Time>
     <Type>1</Type>
-    <Pos>0</Pos>
+    <Pos>1</Pos>
   </Node>
   <Node>
-    <Time>48.840</Time>
+    <Time>30.034</Time>
     <Type>0</Type>
-    <Pos>2</Pos>
-  </Node>
-  <Node>
-    <Time>49.395</Time>
-    <Type>1</Type>
-    <Pos>0</Pos>
-  </Node>
-  <Node>
-    <Time>49.928</Time>
-    <Type>0</Type>
-    <Pos>2</Pos>
-  </Node>
-  <Node>
-    <Time>50.525</Time>
-    <Type>2</Type>
-    <Pos>0</Pos>
-  </Node>
-  <Node>
-    <Time>51.123</Time>
-    <Type>0</Type>
-    <Pos>2</Pos>
-  </Node>
-  <Node>
-    <Time>51.677</Time>
-    <Type>2</Type>
-    <Pos>0</Pos>
-  </Node>
-  <Node>
-    <Time>52.211</Time>
-    <Type>0</Type>
-    <Pos>2</Pos>
-  </Node>
-  <Node>
-    <Time>52.744</Time>
-    <Type>1</Type>
-    <Pos>0</Pos>
-  </Node>
-  <Node>
-    <Time>53.277</Time>
-    <Type>0</Type>
-    <Pos>2</Pos>
-  </Node>
-  <Node>
-    <Time>53.853</Time>
-    <Type>2</Type>
-    <Pos>0</Pos>
-  </Node>
-  <Node>
-    <Time>54.408</Time>
-    <Type>0</Type>
-    <Pos>2</Pos>
-  </Node>
-  <Node>
-    <Time>54.920</Time>
-    <Type>1</Type>
     <Pos>1</Pos>
   </Node>
 </AllNode>

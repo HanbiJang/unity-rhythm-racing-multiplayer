@@ -558,7 +558,8 @@ MonoBehaviour:
   failCountMax: 30
   failNodeCount: 0
   simulationGapDistance: 30
-  simulationNodeSpeed: 10
+  simulationNodeSpeed: 40
+  GapBetweenPlayer: 30
   outputRelativePath: MyServer/MyServer/MusicNodeData.xml
   recordButton: {fileID: 1233457754}
   stopButton: {fileID: 1795842788}
